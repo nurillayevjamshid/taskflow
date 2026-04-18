@@ -85,12 +85,17 @@ export function AppHeader({ transparent, sticky = true, children }: Props) {
             <div className="flex items-center gap-2">
               <Button
                 render={<Link href="/login" />}
+                nativeButton={false}
                 variant="ghost"
                 size="sm"
               >
                 Kirish
               </Button>
-              <Button render={<Link href="/register" />} size="sm">
+              <Button
+                render={<Link href="/register" />}
+                nativeButton={false}
+                size="sm"
+              >
                 Ro&apos;yxatdan o&apos;tish
               </Button>
             </div>

@@ -75,6 +75,7 @@ export default function Home() {
             <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Button
                 render={<Link href="/register" />}
+                nativeButton={false}
                 size="lg"
                 className="min-w-44"
               >
@@ -83,6 +84,7 @@ export default function Home() {
               </Button>
               <Button
                 render={<Link href="/login" />}
+                nativeButton={false}
                 size="lg"
                 variant="outline"
                 className="min-w-44"
@@ -196,11 +198,16 @@ export default function Home() {
                 yarating.
               </p>
               <div className="mt-8 flex justify-center gap-3">
-                <Button render={<Link href="/register" />} size="lg">
+                <Button
+                  render={<Link href="/register" />}
+                  nativeButton={false}
+                  size="lg"
+                >
                   Bepul boshlash <ArrowRight className="size-4" />
                 </Button>
                 <Button
                   render={<Link href="/login" />}
+                  nativeButton={false}
                   size="lg"
                   variant="outline"
                 >

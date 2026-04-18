@@ -75,7 +75,11 @@ function BoardPageContent({ boardId }: { boardId: string }) {
           <p className="text-muted-foreground">
             Bunday doska topilmadi yoki sizda ruxsat yo&apos;q.
           </p>
-          <Button render={<Link href="/dashboard" />} className="mt-4">
+          <Button
+            render={<Link href="/dashboard" />}
+            nativeButton={false}
+            className="mt-4"
+          >
             <LayoutDashboard className="size-4" />
             Dashboardga qaytish
           </Button>
