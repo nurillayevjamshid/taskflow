@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -54,12 +55,14 @@ export function AppHeader({ transparent, sticky = true, children }: Props) {
                 <UserAvatar user={user} size="md" ring />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel className="flex flex-col">
-                  <span className="font-semibold">{user.name}</span>
-                  <span className="text-xs font-normal text-muted-foreground">
-                    {user.email}
-                  </span>
-                </DropdownMenuLabel>
+                <DropdownMenuGroup>
+                  <DropdownMenuLabel className="flex flex-col">
+                    <span className="font-semibold">{user.name}</span>
+                    <span className="text-xs font-normal text-muted-foreground">
+                      {user.email}
+                    </span>
+                  </DropdownMenuLabel>
+                </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={() => router.push("/dashboard")}
