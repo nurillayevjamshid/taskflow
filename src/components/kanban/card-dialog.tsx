@@ -49,10 +49,13 @@ export function CardDialog({ cardId, open, onClose }: Props) {
     card ? s.boards.find((b) => b.id === card.boardId) : undefined,
   );
   const users = useDataStore((s) => s.users);
-  const comments = useDataStore((s) =>
-    s.comments
-      .filter((cm) => cm.cardId === cardId)
-      .sort((a, b) => b.createdAt - a.createdAt),
+  const allComments = useDataStore((s) => s.comments);
+  const comments = useMemo(
+    () =>
+      allComments
+        .filter((cm) => cm.cardId === cardId)
+        .sort((a, b) => b.createdAt - a.createdAt),
+    [allComments, cardId],
   );
   const updateCard = useDataStore((s) => s.updateCard);
   const deleteCard = useDataStore((s) => s.deleteCard);
