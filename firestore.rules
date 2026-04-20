@@ -7,6 +7,9 @@ service cloud.firestore {
     function uid() {
       return request.auth.uid;
     }
+    function email() {
+      return request.auth.token.email.lower();
+    }
     function isBoardMember(boardId) {
       return isSignedIn() &&
         uid() in get(/databases/$(database)/documents/boards/$(boardId)).data.memberIds;
@@ -18,6 +21,10 @@ service cloud.firestore {
     function isBoardMemberAfter(boardId) {
       return isSignedIn() &&
         uid() in getAfter(/databases/$(database)/documents/boards/$(boardId)).data.memberIds;
+    }
+    // Deterministic invitation doc id: `${boardId}__${email}` (email lowercased).
+    function invitationIdFor(boardId, normalizedEmail) {
+      return boardId + '__' + normalizedEmail;
     }
 
     // Any signed-in user can read user profiles (needed for rendering board
@@ -42,7 +49,25 @@ service cloud.firestore {
       allow create: if isSignedIn()
         && uid() == request.resource.data.createdBy
         && uid() in request.resource.data.memberIds;
-      allow update: if isSignedIn() && uid() in resource.data.memberIds;
+      // Update path:
+      //   (a) existing board members can edit anything; OR
+      //   (b) a signed-in user with an accepted invitation for this board
+      //       can add themselves to memberIds. The `getAfter()` check lets
+      //       the same writeBatch mark the invitation accepted AND add the
+      //       user in one atomic step.
+      allow update: if isSignedIn() && (
+        uid() in resource.data.memberIds
+        || (
+          request.auth.uid in request.resource.data.memberIds
+          && !(request.auth.uid in resource.data.memberIds)
+          && getAfter(
+              /databases/$(database)/documents/invitations/$(invitationIdFor(boardId, email()))
+            ).data.status == 'accepted'
+          && getAfter(
+              /databases/$(database)/documents/invitations/$(invitationIdFor(boardId, email()))
+            ).data.inviteeUid == request.auth.uid
+        )
+      );
       allow delete: if isSignedIn() && uid() == resource.data.createdBy;
 
       // Subcollection reads check the current board doc; writes use `After`
@@ -62,6 +87,49 @@ service cloud.firestore {
         allow create, update: if isBoardMemberAfter(boardId);
         allow delete: if isBoardMember(boardId) || isBoardMemberAfter(boardId);
       }
+    }
+
+    // Board invitations. Doc id is `${boardId}__${inviteeEmail.lower()}` so
+    // each (board, email) pair has at most one outstanding invitation.
+    match /invitations/{invitationId} {
+      // Invitee (matched by Auth email) or inviter may read.
+      allow read: if isSignedIn() && (
+        email() == resource.data.inviteeEmail
+        || uid() == resource.data.inviterUid
+      );
+
+      // Only a current member of the board may create invitations, and the
+      // doc id must match the deterministic scheme.
+      allow create: if isSignedIn()
+        && uid() == request.resource.data.inviterUid
+        && request.resource.data.status == 'pending'
+        && invitationId == invitationIdFor(
+             request.resource.data.boardId,
+             request.resource.data.inviteeEmail
+           )
+        && request.resource.data.inviteeEmail == request.resource.data.inviteeEmail.lower()
+        && uid() in get(
+             /databases/$(database)/documents/boards/$(request.resource.data.boardId)
+           ).data.memberIds;
+
+      // Only the invitee can change status (accept / decline). They must set
+      // inviteeUid to their own uid on accept so the board-update rule above
+      // can cross-verify.
+      allow update: if isSignedIn()
+        && email() == resource.data.inviteeEmail
+        && request.resource.data.inviteeEmail == resource.data.inviteeEmail
+        && resource.data.status == 'pending'
+        && request.resource.data.status in ['accepted', 'declined']
+        && (
+          request.resource.data.status == 'declined'
+          || request.resource.data.inviteeUid == uid()
+        );
+
+      // Inviter can cancel, invitee can dismiss.
+      allow delete: if isSignedIn() && (
+        email() == resource.data.inviteeEmail
+        || uid() == resource.data.inviterUid
+      );
     }
   }
 }

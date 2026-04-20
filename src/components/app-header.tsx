@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { UserAvatar } from "@/components/user-avatar";
 import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { InvitationsInbox } from "@/components/invitations-inbox";
 import { LogOut, LayoutDashboard } from "lucide-react";
 import { useAuthStore } from "@/store/auth-store";
 import { useDataStore } from "@/store/data-store";
@@ -44,6 +45,7 @@ export function AppHeader({ transparent, sticky = true, children }: Props) {
         <Logo />
         <div className="flex-1 min-w-0">{children}</div>
         <div className="flex items-center gap-1">
+          {user && <InvitationsInbox />}
           <ThemeToggle />
           {user ? (
             <DropdownMenu>

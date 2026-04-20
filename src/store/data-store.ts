@@ -19,6 +19,7 @@ import type {
   BoardBackground,
   Card,
   Comment,
+  Invitation,
   Label,
   List,
   User,
@@ -26,6 +27,7 @@ import type {
 } from "@/lib/types";
 import { db } from "@/lib/firebase";
 import { makeId } from "@/lib/hash";
+import { useAuthStore } from "@/store/auth-store";
 
 interface DataState {
   users: User[];
@@ -34,6 +36,7 @@ interface DataState {
   lists: List[];
   cards: Card[];
   comments: Comment[];
+  invitations: Invitation[];
 
   /** True once the global subscriptions (users/workspaces/boards) have delivered. */
   hydrated: boolean;
@@ -42,6 +45,8 @@ interface DataState {
   subscribeGlobal: (userId: string) => () => void;
   /** Subscribe to one board's lists/cards/comments subcollections. */
   subscribeBoard: (boardId: string) => () => void;
+  /** Subscribe to invitations addressed to the signed-in user's email. */
+  subscribeInvitations: (email: string) => () => void;
   /** Clear local state (on logout). */
   clear: () => void;
 
@@ -104,7 +109,24 @@ interface DataState {
     text: string,
   ) => Promise<Comment>;
   deleteComment: (commentId: string) => Promise<void>;
+
+  // invitations
+  sendInvitation: (
+    boardId: string,
+    inviteeEmail: string,
+    inviter: User,
+  ) => Promise<Invitation>;
+  acceptInvitation: (invitationId: string) => Promise<void>;
+  declineInvitation: (invitationId: string) => Promise<void>;
+  cancelInvitation: (invitationId: string) => Promise<void>;
 }
+
+/** Deterministic invitation doc id — must match the Firestore rule. */
+function invitationIdFor(boardId: string, email: string): string {
+  return `${boardId}__${email.trim().toLowerCase()}`;
+}
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Track which boards we're subscribed to so we can ref-count and replace
 // state slices correctly.
@@ -130,6 +152,7 @@ export const useDataStore = create<DataState>()((set, get) => ({
   lists: [],
   cards: [],
   comments: [],
+  invitations: [],
   hydrated: false,
 
   subscribeGlobal: (userId) => {
@@ -246,6 +269,24 @@ export const useDataStore = create<DataState>()((set, get) => ({
     };
   },
 
+  subscribeInvitations: (email) => {
+    const normalized = email.trim().toLowerCase();
+    if (!normalized) return () => {};
+    const unsub = onSnapshot(
+      query(
+        collection(db, "invitations"),
+        where("inviteeEmail", "==", normalized),
+      ),
+      (snap) => {
+        set({ invitations: snap.docs.map((d) => d.data() as Invitation) });
+      },
+      () => {
+        // Permission errors (e.g. during sign-out race) shouldn't crash.
+      },
+    );
+    return unsub;
+  },
+
   clear: () => {
     for (const unsub of boardUnsubscribers.values()) unsub();
     boardUnsubscribers.clear();
@@ -257,6 +298,7 @@ export const useDataStore = create<DataState>()((set, get) => ({
       lists: [],
       cards: [],
       comments: [],
+      invitations: [],
       hydrated: false,
     });
   },
@@ -536,5 +578,76 @@ export const useDataStore = create<DataState>()((set, get) => ({
     const card = findCard(cm.cardId, get().cards);
     if (!card) return;
     await deleteDoc(doc(db, "boards", card.boardId, "comments", commentId));
+  },
+
+  // ── invitations ─────────────────────────────────────────────────────────────
+
+  sendInvitation: async (boardId, inviteeEmail, inviter) => {
+    const normalized = inviteeEmail.trim().toLowerCase();
+    if (!EMAIL_RE.test(normalized)) {
+      throw new Error("Email noto'g'ri");
+    }
+    if (normalized === inviter.email.trim().toLowerCase()) {
+      throw new Error("O'zingizni taklif qila olmaysiz");
+    }
+    const board = get().boards.find((b) => b.id === boardId);
+    if (!board) throw new Error("Doska topilmadi");
+    const existingUser = get().users.find(
+      (u) => u.email.trim().toLowerCase() === normalized,
+    );
+    if (existingUser && board.memberIds.includes(existingUser.id)) {
+      throw new Error("Bu foydalanuvchi allaqachon doska a'zosi");
+    }
+
+    const id = invitationIdFor(boardId, normalized);
+    const invitation: Invitation = {
+      id,
+      boardId,
+      boardName: board.name,
+      workspaceId: board.workspaceId,
+      inviterUid: inviter.id,
+      inviterName: inviter.name,
+      inviterEmail: inviter.email,
+      inviteeEmail: normalized,
+      inviteeUid: null,
+      status: "pending",
+      createdAt: Date.now(),
+    };
+    await setDoc(doc(db, "invitations", id), invitation);
+    return invitation;
+  },
+
+  acceptInvitation: async (invitationId) => {
+    const inv = get().invitations.find((i) => i.id === invitationId);
+    if (!inv) throw new Error("Taklif topilmadi");
+    if (inv.status !== "pending")
+      throw new Error("Bu taklif allaqachon javob berilgan");
+    const currentUserId = useAuthStore.getState().currentUserId;
+    if (!currentUserId) throw new Error("Tizimga kirmagansiz");
+
+    // Atomic: mark invitation accepted AND add user to board.memberIds. The
+    // board-update rule uses getAfter() on the invitation so both writes must
+    // succeed together.
+    const batch = writeBatch(db);
+    batch.update(doc(db, "invitations", invitationId), {
+      status: "accepted",
+      respondedAt: Date.now(),
+      inviteeUid: currentUserId,
+    });
+    batch.update(doc(db, "boards", inv.boardId), {
+      memberIds: arrayUnion(currentUserId),
+    });
+    await batch.commit();
+  },
+
+  declineInvitation: async (invitationId) => {
+    await updateDoc(doc(db, "invitations", invitationId), {
+      status: "declined",
+      respondedAt: Date.now(),
+    });
+  },
+
+  cancelInvitation: async (invitationId) => {
+    await deleteDoc(doc(db, "invitations", invitationId));
   },
 }));

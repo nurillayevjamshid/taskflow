@@ -91,3 +91,22 @@ export interface Activity {
   text: string;
   createdAt: number;
 }
+
+export type InvitationStatus = "pending" | "accepted" | "declined";
+
+export interface Invitation {
+  id: ID;
+  boardId: ID;
+  boardName: string;
+  workspaceId: ID;
+  inviterUid: ID;
+  inviterName: string;
+  inviterEmail: string;
+  /** Stored lowercased to match Firestore queries. */
+  inviteeEmail: string;
+  /** Filled in when the invitation is accepted. */
+  inviteeUid?: ID | null;
+  status: InvitationStatus;
+  createdAt: number;
+  respondedAt?: number;
+}
