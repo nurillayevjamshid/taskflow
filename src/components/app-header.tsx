@@ -16,6 +16,7 @@ import { UserAvatar } from "@/components/user-avatar";
 import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { InvitationsInbox } from "@/components/invitations-inbox";
+import { LanguageSelector } from "@/components/language-selector";
 import { LogOut, LayoutDashboard } from "lucide-react";
 import { useAuthStore } from "@/store/auth-store";
 import { useDataStore } from "@/store/data-store";
@@ -47,6 +48,7 @@ export function AppHeader({ transparent, sticky = true, children }: Props) {
         <div className="flex items-center gap-1">
           {user && <InvitationsInbox />}
           <ThemeToggle />
+          <LanguageSelector />
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger
