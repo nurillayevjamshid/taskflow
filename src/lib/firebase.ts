@@ -2,7 +2,7 @@
 
 import { getApp, getApps, initializeApp } from "firebase/app";
 import { getAuth, setPersistence, browserLocalPersistence } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, enableIndexedDbPersistence } from "firebase/firestore";
 
 // These values are public by design (Firebase web SDK config). Access control
 // is enforced server-side via Firestore security rules.
@@ -23,5 +23,16 @@ export const db = getFirestore(firebaseApp);
 if (typeof window !== "undefined") {
   setPersistence(auth, browserLocalPersistence).catch(() => {
     // Non-fatal: auth still works in memory for the session.
+  });
+
+  // Enable offline persistence so the app works without internet.
+  enableIndexedDbPersistence(db).catch((err) => {
+    if (err.code === "failed-precondition") {
+      // Multiple tabs open, persistence can only be enabled in one tab at a time.
+      console.warn("Firebase persistence: multiple tabs open");
+    } else if (err.code === "unimplemented") {
+      // The browser doesn't support IndexedDB.
+      console.warn("Firebase persistence: browser not supported");
+    }
   });
 }
