@@ -63,7 +63,7 @@ export function CreateBoardDialog({
     setOpen(false);
     setName("");
     if (onCreated) onCreated(board.id);
-    else router.push(`/b/${board.id}`);
+    else router.push(`/b?id=${board.id}`);
   };
 
   return (

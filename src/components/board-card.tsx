@@ -20,7 +20,7 @@ export function BoardCard({ board }: { board: Board }) {
 
   return (
     <Link
-      href={`/b/${board.id}`}
+      href={`/b?id=${board.id}`}
       className="group relative block overflow-hidden rounded-2xl border border-border bg-card transition hover:-translate-y-0.5 hover:shadow-premium"
     >
       <div

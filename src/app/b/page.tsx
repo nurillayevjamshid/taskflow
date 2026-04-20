@@ -1,8 +1,8 @@
 "use client";
 
-import { use, useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   ChevronLeft,
   LayoutDashboard,
@@ -29,17 +29,20 @@ import { useAuthStore } from "@/store/auth-store";
 import { BOARD_BACKGROUNDS } from "@/lib/backgrounds";
 import { cn } from "@/lib/utils";
 
-export default function BoardPage({
-  params,
-}: {
-  params: Promise<{ boardId: string }>;
-}) {
-  const { boardId } = use(params);
+export default function BoardPage() {
   return (
     <AuthGuard>
-      <BoardPageContent boardId={boardId} />
+      <Suspense fallback={null}>
+        <BoardPageSearchParams />
+      </Suspense>
     </AuthGuard>
   );
+}
+
+function BoardPageSearchParams() {
+  const searchParams = useSearchParams();
+  const boardId = searchParams.get("id") ?? "";
+  return <BoardPageContent boardId={boardId} />;
 }
 
 function BoardPageContent({ boardId }: { boardId: string }) {
