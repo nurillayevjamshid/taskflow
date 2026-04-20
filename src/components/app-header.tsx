@@ -50,20 +50,18 @@ export function AppHeader({ transparent, sticky = true, children }: Props) {
         <div className="flex items-center gap-1">
           {user && <InvitationsInbox />}
           <ThemeToggle />
-          <Button
-            variant="ghost"
-            size="icon"
+          <button
             onClick={() => {
               const locales: Array<"uz" | "ru" | "en"> = ["uz", "ru", "en"];
               const currentIndex = locales.indexOf(locale);
               const nextLocale = locales[(currentIndex + 1) % locales.length];
               setLocale(nextLocale);
             }}
-            className="size-9"
+            className="size-9 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring flex items-center justify-center hover:bg-accent transition"
             title="Change language"
           >
             <Globe className="size-4" />
-          </Button>
+          </button>
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger
