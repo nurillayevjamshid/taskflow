@@ -76,6 +76,28 @@ export function AppHeader({ transparent, sticky = true, children }: Props) {
                   Dashboard
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
+                <DropdownMenuLabel className="flex items-center gap-2">
+                  Til
+                </DropdownMenuLabel>
+                <DropdownMenuItem
+                  onClick={() => setLocale("uz")}
+                  className={locale === "uz" ? "bg-muted" : "cursor-pointer"}
+                >
+                  O&apos;zbek tili
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setLocale("ru")}
+                  className={locale === "ru" ? "bg-muted" : "cursor-pointer"}
+                >
+                  Русский язык
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setLocale("en")}
+                  className={locale === "en" ? "bg-muted" : "cursor-pointer"}
+                >
+                  English
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={() => {
                     logout();
