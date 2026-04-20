@@ -71,12 +71,15 @@ interface DataState {
   toggleStar: (id: string) => Promise<void>;
   addBoardMember: (boardId: string, userId: string) => Promise<void>;
   removeBoardMember: (boardId: string, userId: string) => Promise<void>;
+  leaveBoard: (boardId: string, userId: string) => Promise<void>;
+  migrateBoard: (boardId: string) => Promise<void>;
 
   // lists
   createList: (boardId: string, name: string) => Promise<List>;
   updateList: (id: string, patch: Partial<List>) => Promise<void>;
   deleteList: (id: string) => Promise<void>;
   reorderLists: (boardId: string, orderedIds: string[]) => Promise<void>;
+  setListColor: (listId: string, color: string) => Promise<void>;
 
   // cards
   createCard: (
@@ -96,6 +99,8 @@ interface DataState {
   addCardLabel: (cardId: string, label: Omit<Label, "id">) => Promise<void>;
   removeCardLabel: (cardId: string, labelId: string) => Promise<void>;
   toggleCardMember: (cardId: string, userId: string) => Promise<void>;
+  sendCardToReview: (cardId: string) => Promise<void>;
+  reconcileCards: () => Promise<void>;
 
   // comments
   addComment: (
@@ -313,9 +318,11 @@ export const useDataStore = create<DataState>()((set, get) => ({
     batch.set(doc(db, "boards", b.id), b);
     const now = Date.now();
     const defaults: List[] = [
-      { id: "l_" + makeId(), boardId: b.id, name: "Rejada", position: 0, createdAt: now },
-      { id: "l_" + makeId(), boardId: b.id, name: "Jarayonda", position: 1, createdAt: now },
-      { id: "l_" + makeId(), boardId: b.id, name: "Bajarildi", position: 2, createdAt: now },
+      { id: "l_" + makeId(), boardId: b.id, name: "Rejada", position: 0, kind: "planned", createdAt: now },
+      { id: "l_" + makeId(), boardId: b.id, name: "Jarayonda", position: 1, kind: "in_progress", createdAt: now },
+      { id: "l_" + makeId(), boardId: b.id, name: "Ko'rib chiqilmoqda", position: 2, kind: "review", createdAt: now },
+      { id: "l_" + makeId(), boardId: b.id, name: "Bajarildi", position: 3, kind: "done", createdAt: now },
+      { id: "l_" + makeId(), boardId: b.id, name: "Bajarilmadi", position: 4, kind: "failed", createdAt: now },
     ];
     for (const l of defaults) {
       batch.set(doc(db, "boards", b.id, "lists", l.id), l);
@@ -361,6 +368,63 @@ export const useDataStore = create<DataState>()((set, get) => ({
       memberIds: arrayRemove(userId),
     });
   },
+  leaveBoard: async (boardId, userId) => {
+    await updateDoc(doc(db, "boards", boardId), {
+      memberIds: arrayRemove(userId),
+    });
+  },
+  migrateBoard: async (boardId) => {
+    const boardLists = get().lists.filter((l) => l.boardId === boardId);
+    const now = Date.now();
+    
+    // Check if board needs migration (has lists without kind field)
+    const needsMigration = boardLists.some((l) => !l.kind);
+    
+    if (!needsMigration) return;
+    
+    const batch = writeBatch(db);
+    
+    // Update existing lists with kind field
+    boardLists.forEach((list) => {
+      let kind: "planned" | "in_progress" | "review" | "done" | "failed" = "planned";
+      if (list.name === "Jarayonda") kind = "in_progress";
+      else if (list.name === "Bajarildi") kind = "done";
+      else if (list.name === "Ko'rib chiqilmoqda") kind = "review";
+      else if (list.name === "Bajarilmadi") kind = "failed";
+      
+      batch.update(doc(db, "boards", boardId, "lists", list.id), { kind });
+    });
+    
+    // Add missing columns if they don't exist
+    const hasReview = boardLists.some((l) => l.name === "Ko'rib chiqilmoqda" || l.kind === "review");
+    const hasFailed = boardLists.some((l) => l.name === "Bajarilmadi" || l.kind === "failed");
+    
+    if (!hasReview) {
+      const reviewList: List = {
+        id: "l_" + makeId(),
+        boardId,
+        name: "Ko'rib chiqilmoqda",
+        position: 2,
+        kind: "review",
+        createdAt: now,
+      };
+      batch.set(doc(db, "boards", boardId, "lists", reviewList.id), reviewList);
+    }
+    
+    if (!hasFailed) {
+      const failedList: List = {
+        id: "l_" + makeId(),
+        boardId,
+        name: "Bajarilmadi",
+        position: 4,
+        kind: "failed",
+        createdAt: now,
+      };
+      batch.set(doc(db, "boards", boardId, "lists", failedList.id), failedList);
+    }
+    
+    await batch.commit();
+  },
 
   // ── lists ───────────────────────────────────────────────────────────────────
 
@@ -371,6 +435,7 @@ export const useDataStore = create<DataState>()((set, get) => ({
       boardId,
       name: name.trim() || "Yangi ustun",
       position: existing.length,
+      kind: "planned",
       createdAt: Date.now(),
     };
     await setDoc(doc(db, "boards", boardId, "lists", l.id), l);
@@ -406,6 +471,11 @@ export const useDataStore = create<DataState>()((set, get) => ({
       batch.update(doc(db, "boards", boardId, "lists", id), { position: idx });
     });
     await batch.commit();
+  },
+  setListColor: async (listId, color) => {
+    const l = findList(listId, get().lists);
+    if (!l) return;
+    await updateDoc(doc(db, "boards", l.boardId, "lists", listId), { color });
   },
 
   // ── cards ───────────────────────────────────────────────────────────────────
@@ -513,6 +583,58 @@ export const useDataStore = create<DataState>()((set, get) => ({
     await updateDoc(doc(db, "boards", c.boardId, "cards", cardId), {
       memberIds: isMember ? arrayRemove(userId) : arrayUnion(userId),
     });
+  },
+  sendCardToReview: async (cardId) => {
+    const c = findCard(cardId, get().cards);
+    if (!c) return;
+    const board = get().boards.find((b) => b.id === c.boardId);
+    if (!board) return;
+    const reviewList = get().lists.find(
+      (l) => l.boardId === board.id && l.kind === "review"
+    );
+    if (!reviewList) return;
+    await get().moveCard(cardId, reviewList.id, 0);
+  },
+  reconcileCards: async () => {
+    const state = get();
+    const now = Date.now();
+    const boards = state.boards;
+    
+    for (const board of boards) {
+      const lists = state.lists.filter((l) => l.boardId === board.id);
+      const plannedList = lists.find((l) => l.kind === "planned");
+      const inProgressList = lists.find((l) => l.kind === "in_progress");
+      const reviewList = lists.find((l) => l.kind === "review");
+      const doneList = lists.find((l) => l.kind === "done");
+      const failedList = lists.find((l) => l.kind === "failed");
+      
+      if (!plannedList || !inProgressList || !failedList) continue;
+      
+      const cards = state.cards.filter((c) => c.boardId === board.id);
+      
+      for (const card of cards) {
+        // startAt <= now and in Planned → In Progress
+        if (
+          card.startAt &&
+          card.startAt <= now &&
+          card.listId === plannedList.id
+        ) {
+          await get().moveCard(card.id, inProgressList.id, 0);
+        }
+        
+        // dueDate < now and in Planned/In Progress → Failed
+        if (
+          card.dueDate &&
+          card.dueDate < now &&
+          !card.completed &&
+          (card.listId === plannedList.id || card.listId === inProgressList.id)
+        ) {
+          await get().moveCard(card.id, failedList.id, 0);
+        }
+        
+        // Cards in review are not affected by auto-reconcile
+      }
+    }
   },
 
   // ── comments ────────────────────────────────────────────────────────────────

@@ -64,6 +64,7 @@ export function CardDialog({ cardId, open, onClose }: Props) {
   const removeCardLabel = useDataStore((s) => s.removeCardLabel);
   const addComment = useDataStore((s) => s.addComment);
   const deleteComment = useDataStore((s) => s.deleteComment);
+  const sendCardToReview = useDataStore((s) => s.sendCardToReview);
   const currentUserId = useAuthStore((s) => s.currentUserId);
 
   const [title, setTitle] = useState("");
@@ -102,6 +103,8 @@ export function CardDialog({ cardId, open, onClose }: Props) {
   };
 
   const assignedMembers = users.filter((u) => card.memberIds.includes(u.id));
+  const isAssignee = card.memberIds.includes(currentUserId || "");
+  const isInProgress = list?.kind === "in_progress";
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
@@ -186,6 +189,39 @@ export function CardDialog({ cardId, open, onClose }: Props) {
                   );
                 })}
                 <AddLabel cardId={card.id} onAdd={addCardLabel} />
+              </div>
+            </section>
+
+            <section>
+              <div className="mb-2 flex items-center gap-2 text-sm font-semibold">
+                <Calendar className="size-4" />
+                Boshlanish vaqti
+              </div>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="date"
+                  className="w-auto"
+                  value={
+                    card.startAt
+                      ? format(new Date(card.startAt), "yyyy-MM-dd")
+                      : ""
+                  }
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    updateCard(card.id, {
+                      startAt: v ? new Date(v).getTime() : null,
+                    });
+                  }}
+                />
+                {card.startAt && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => updateCard(card.id, { startAt: null })}
+                  >
+                    Tozalash
+                  </Button>
+                )}
               </div>
             </section>
 
@@ -319,6 +355,14 @@ export function CardDialog({ cardId, open, onClose }: Props) {
           </div>
 
           <aside className="space-y-3">
+            {isAssignee && isInProgress && (
+              <Button
+                className="w-full"
+                onClick={() => sendCardToReview(card.id)}
+              >
+                Tekshiruvga yuborish
+              </Button>
+            )}
             <div className="rounded-xl border border-border bg-muted/30 p-3 text-xs text-muted-foreground">
               Qo&apos;shilgan:{" "}
               <span className="font-medium text-foreground">

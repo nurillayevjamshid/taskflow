@@ -15,9 +15,10 @@ import { Button } from "@/components/ui/button";
 import { UserAvatar } from "@/components/user-avatar";
 import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { LogOut, LayoutDashboard } from "lucide-react";
+import { LogOut, LayoutDashboard, Languages } from "lucide-react";
 import { useAuthStore } from "@/store/auth-store";
 import { useDataStore } from "@/store/data-store";
+import { useTranslation } from "@/lib/i18n";
 
 interface Props {
   transparent?: boolean;
@@ -32,6 +33,7 @@ export function AppHeader({ transparent, sticky = true, children }: Props) {
   const user = useDataStore((s) =>
     s.users.find((u) => u.id === currentUserId),
   );
+  const { locale, setLocale } = useTranslation();
 
   return (
     <header
@@ -70,6 +72,29 @@ export function AppHeader({ transparent, sticky = true, children }: Props) {
                 >
                   <LayoutDashboard className="size-4" />
                   Dashboard
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel className="flex items-center gap-2">
+                  <Languages className="size-4" />
+                  Til
+                </DropdownMenuLabel>
+                <DropdownMenuItem
+                  onClick={() => setLocale("uz")}
+                  className={locale === "uz" ? "bg-muted" : "cursor-pointer"}
+                >
+                  O&apos;zbek tili
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setLocale("ru")}
+                  className={locale === "ru" ? "bg-muted" : "cursor-pointer"}
+                >
+                  Русский язык
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setLocale("en")}
+                  className={locale === "en" ? "bg-muted" : "cursor-pointer"}
+                >
+                  English
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem

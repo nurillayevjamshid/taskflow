@@ -19,6 +19,14 @@ service cloud.firestore {
       return isSignedIn() &&
         uid() in getAfter(/databases/$(database)/documents/boards/$(boardId)).data.memberIds;
     }
+    function isBoardAdmin(boardId) {
+      return isSignedIn() &&
+        uid() == get(/databases/$(database)/documents/boards/$(boardId)).data.createdBy;
+    }
+    function isBoardAdminAfter(boardId) {
+      return isSignedIn() &&
+        uid() == getAfter(/databases/$(database)/documents/boards/$(boardId)).data.createdBy;
+    }
 
     // Any signed-in user can read user profiles (needed for rendering board
     // members and inviting teammates). Only the owner can write their own doc.
@@ -42,14 +50,20 @@ service cloud.firestore {
       allow create: if isSignedIn()
         && uid() == request.resource.data.createdBy
         && uid() in request.resource.data.memberIds;
-      allow update: if isSignedIn() && uid() in resource.data.memberIds;
+      // Allow update if user is a board member, OR if user is removing themselves (leave board)
+      allow update: if isSignedIn() && (uid() in resource.data.memberIds || 
+        (uid() in resource.data.memberIds && uid() not in request.resource.data.memberIds));
       allow delete: if isSignedIn() && uid() == resource.data.createdBy;
 
       // Subcollection reads check the current board doc; writes use `After`
       // so that batch-creating a board and its first list/card is allowed.
       match /lists/{listId} {
         allow read: if isBoardMember(boardId);
-        allow create, update: if isBoardMemberAfter(boardId);
+        // Allow create for board members
+        allow create: if isBoardMemberAfter(boardId);
+        // Allow update for board members, but restrict color changes to admin
+        allow update: if isBoardMemberAfter(boardId) && 
+          (!request.resource.data.diff(resource.data).affectedKeys().hasOnly(['color']) || isBoardAdminAfter(boardId));
         allow delete: if isBoardMember(boardId) || isBoardMemberAfter(boardId);
       }
       match /cards/{cardId} {

@@ -47,11 +47,15 @@ export interface Board {
   starred?: boolean;
 }
 
+export type ListKind = "planned" | "in_progress" | "review" | "done" | "failed";
+
 export interface List {
   id: ID;
   boardId: ID;
   name: string;
   position: number;
+  kind: ListKind;
+  color?: string;
   createdAt: number;
 }
 
@@ -71,6 +75,7 @@ export interface Card {
   labels: Label[];
   memberIds: ID[];
   dueDate?: number | null;
+  startAt?: number | null;
   completed?: boolean;
   createdBy: ID;
   createdAt: number;
