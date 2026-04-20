@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { THEME_KEY } from "@/lib/storage";
+
+const THEME_KEY = "taskly:theme";
 
 export function ThemeToggle() {
   const [isDark, setIsDark] = useState(false);

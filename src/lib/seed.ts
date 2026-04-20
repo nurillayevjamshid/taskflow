@@ -1,66 +1,20 @@
-import type { Board, Card, List, User, Workspace, Comment } from "./types";
-import { makeId, pickAvatarColor } from "./hash";
+import { doc, writeBatch } from "firebase/firestore";
+import type { Board, Card, List, Workspace } from "./types";
+import { db } from "./firebase";
+import { makeId } from "./hash";
 
-export interface Seed {
-  users: User[];
-  workspaces: Workspace[];
-  boards: Board[];
-  lists: List[];
-  cards: Card[];
-  comments: Comment[];
-}
-
-// Demo users are always present so real users can invite teammates immediately
-// on a fresh install. They cannot log in themselves — their passwordHash is
-// set to an empty string so a login attempt will never match.
-const DEMO_PASSWORD_HASH = "";
-
-export function buildDemoSeed(): Seed {
-  const now = Date.now();
-  const alice: User = {
-    id: "u_demo_alice",
-    name: "Alisher Karimov",
-    email: "alisher@taskly.demo",
-    passwordHash: DEMO_PASSWORD_HASH,
-    avatarColor: pickAvatarColor("alisher"),
-    createdAt: now,
-  };
-  const bob: User = {
-    id: "u_demo_bob",
-    name: "Bekzod Yo'ldoshev",
-    email: "bekzod@taskly.demo",
-    passwordHash: DEMO_PASSWORD_HASH,
-    avatarColor: pickAvatarColor("bekzod"),
-    createdAt: now,
-  };
-  const mira: User = {
-    id: "u_demo_mira",
-    name: "Mira Rashidova",
-    email: "mira@taskly.demo",
-    passwordHash: DEMO_PASSWORD_HASH,
-    avatarColor: pickAvatarColor("mira"),
-    createdAt: now,
-  };
-  return {
-    users: [alice, bob, mira],
-    workspaces: [],
-    boards: [],
-    lists: [],
-    cards: [],
-    comments: [],
-  };
-}
-
-// Sample board used for new users the first time they visit the dashboard.
-export function buildStarterContent(ownerId: string): {
+export interface StarterContent {
   workspace: Workspace;
   board: Board;
   lists: List[];
   cards: Card[];
-} {
+}
+
+/** Build an in-memory starter workspace + board + cards for a new user. */
+export function buildStarterContent(ownerId: string): StarterContent {
   const now = Date.now();
   const workspace: Workspace = {
-    id: makeId(),
+    id: "w_" + makeId(),
     name: "Mening ishxonam",
     description: "Shaxsiy va jamoa loyihalari uchun asosiy ishxona",
     ownerId,
@@ -68,7 +22,7 @@ export function buildStarterContent(ownerId: string): {
     createdAt: now,
   };
   const board: Board = {
-    id: makeId(),
+    id: "b_" + makeId(),
     workspaceId: workspace.id,
     name: "Boshlash uchun doska",
     description: "Taskly bilan ishni boshlash uchun namuna doska",
@@ -78,43 +32,21 @@ export function buildStarterContent(ownerId: string): {
     createdAt: now,
     starred: true,
   };
-  const l1: List = {
-    id: makeId(),
-    boardId: board.id,
-    name: "Rejada",
-    position: 0,
-    createdAt: now,
-  };
-  const l2: List = {
-    id: makeId(),
-    boardId: board.id,
-    name: "Jarayonda",
-    position: 1,
-    createdAt: now,
-  };
-  const l3: List = {
-    id: makeId(),
-    boardId: board.id,
-    name: "Tekshirishda",
-    position: 2,
-    createdAt: now,
-  };
-  const l4: List = {
-    id: makeId(),
-    boardId: board.id,
-    name: "Bajarildi",
-    position: 3,
-    createdAt: now,
-  };
+  const lists: List[] = [
+    { id: "l_" + makeId(), boardId: board.id, name: "Rejada", position: 0, createdAt: now },
+    { id: "l_" + makeId(), boardId: board.id, name: "Jarayonda", position: 1, createdAt: now },
+    { id: "l_" + makeId(), boardId: board.id, name: "Tekshirishda", position: 2, createdAt: now },
+    { id: "l_" + makeId(), boardId: board.id, name: "Bajarildi", position: 3, createdAt: now },
+  ];
 
-  const card = (
+  const mkCard = (
     listId: string,
     title: string,
     description: string,
     position: number,
     extras: Partial<Card> = {},
   ): Card => ({
-    id: makeId(),
+    id: "c_" + makeId(),
     listId,
     boardId: board.id,
     title,
@@ -128,8 +60,8 @@ export function buildStarterContent(ownerId: string): {
   });
 
   const cards: Card[] = [
-    card(
-      l1.id,
+    mkCard(
+      lists[0].id,
       "Taskly bilan tanishish",
       "Ushbu doskani o'zingizga moslang: ustun qo'shing, kartalarni ko'chiring, a'zolarni taklif qiling.",
       0,
@@ -140,8 +72,8 @@ export function buildStarterContent(ownerId: string): {
         ],
       },
     ),
-    card(
-      l1.id,
+    mkCard(
+      lists[0].id,
       "Mijoz bilan uchrashuvni rejalashtirish",
       "Juma kuni soat 15:00 ga taklif yuborish.",
       1,
@@ -150,8 +82,8 @@ export function buildStarterContent(ownerId: string): {
         dueDate: now + 1000 * 60 * 60 * 48,
       },
     ),
-    card(
-      l2.id,
+    mkCard(
+      lists[1].id,
       "Landing page dizayn konsepti",
       "Hero qism uchun 3 ta variant tayyorlash.",
       0,
@@ -159,8 +91,8 @@ export function buildStarterContent(ownerId: string): {
         labels: [{ id: makeId(), name: "Dizayn", color: "pink" }],
       },
     ),
-    card(
-      l3.id,
+    mkCard(
+      lists[2].id,
       "To'lov oqimini test qilish",
       "Stripe sandbox muhitida asosiy ssenariylarni tekshirish.",
       0,
@@ -168,8 +100,8 @@ export function buildStarterContent(ownerId: string): {
         labels: [{ id: makeId(), name: "QA", color: "amber" }],
       },
     ),
-    card(
-      l4.id,
+    mkCard(
+      lists[3].id,
       "Jamoa uchun brending qo'llanmasi",
       "PDF shaklda e'lon qilindi.",
       0,
@@ -180,5 +112,24 @@ export function buildStarterContent(ownerId: string): {
     ),
   ];
 
-  return { workspace, board, lists: [l1, l2, l3, l4], cards };
+  return { workspace, board, lists, cards };
+}
+
+/** Write starter content to Firestore in a single batch. */
+export async function writeStarterContent(s: StarterContent): Promise<void> {
+  const batch = writeBatch(db);
+  batch.set(doc(db, "workspaces", s.workspace.id), s.workspace);
+  batch.set(doc(db, "boards", s.board.id), s.board);
+  for (const l of s.lists) {
+    batch.set(doc(db, "boards", s.board.id, "lists", l.id), l);
+  }
+  for (const c of s.cards) {
+    batch.set(doc(db, "boards", s.board.id, "cards", c.id), c);
+  }
+  await batch.commit();
+}
+
+/** Legacy export: kept so callers that used to create the sample data can still compile. */
+export async function ensureStarterContentForUser(ownerId: string): Promise<void> {
+  await writeStarterContent(buildStarterContent(ownerId));
 }

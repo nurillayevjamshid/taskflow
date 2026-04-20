@@ -47,6 +47,14 @@ function BoardPageSearchParams() {
 
 function BoardPageContent({ boardId }: { boardId: string }) {
   const router = useRouter();
+  const subscribeBoard = useDataStore((s) => s.subscribeBoard);
+
+  useEffect(() => {
+    if (!boardId) return;
+    const unsub = subscribeBoard(boardId);
+    return () => unsub();
+  }, [boardId, subscribeBoard]);
+
   const board = useDataStore((s) => s.boards.find((b) => b.id === boardId));
   const workspace = useDataStore((s) =>
     board ? s.workspaces.find((w) => w.id === board.workspaceId) : undefined,

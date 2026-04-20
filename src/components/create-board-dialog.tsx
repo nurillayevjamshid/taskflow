@@ -54,12 +54,12 @@ export function CreateBoardDialog({
     w.memberIds.includes(currentUserId ?? ""),
   );
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentUserId || !name.trim()) return;
     const targetWs = selectedWorkspace || myWorkspaces[0]?.id;
     if (!targetWs) return;
-    const board = createBoard(targetWs, name, bg, currentUserId);
+    const board = await createBoard(targetWs, name, bg, currentUserId);
     setOpen(false);
     setName("");
     if (onCreated) onCreated(board.id);
