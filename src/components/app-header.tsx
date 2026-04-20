@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -17,10 +16,9 @@ import { UserAvatar } from "@/components/user-avatar";
 import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { InvitationsInbox } from "@/components/invitations-inbox";
-import { LogOut, LayoutDashboard, Languages, Globe } from "lucide-react";
+import { LogOut, LayoutDashboard } from "lucide-react";
 import { useAuthStore } from "@/store/auth-store";
 import { useDataStore } from "@/store/data-store";
-import { useTranslation } from "@/lib/i18n";
 
 interface Props {
   transparent?: boolean;
@@ -35,7 +33,6 @@ export function AppHeader({ transparent, sticky = true, children }: Props) {
   const user = useDataStore((s) =>
     s.users.find((u) => u.id === currentUserId),
   );
-  const { locale, setLocale, t } = useTranslation();
 
   return (
     <header
@@ -50,18 +47,6 @@ export function AppHeader({ transparent, sticky = true, children }: Props) {
         <div className="flex items-center gap-1">
           {user && <InvitationsInbox />}
           <ThemeToggle />
-          <button
-            onClick={() => {
-              const locales: Array<"uz" | "ru" | "en"> = ["uz", "ru", "en"];
-              const currentIndex = locales.indexOf(locale);
-              const nextLocale = locales[(currentIndex + 1) % locales.length];
-              setLocale(nextLocale);
-            }}
-            className="size-9 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring flex items-center justify-center hover:bg-accent transition"
-            title="Change language"
-          >
-            <Globe className="size-4" />
-          </button>
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger
@@ -86,7 +71,7 @@ export function AppHeader({ transparent, sticky = true, children }: Props) {
                   className="cursor-pointer"
                 >
                   <LayoutDashboard className="size-4" />
-                  {t("dashboard")}
+                  Dashboard
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
@@ -97,7 +82,7 @@ export function AppHeader({ transparent, sticky = true, children }: Props) {
                   className="cursor-pointer text-destructive focus:text-destructive"
                 >
                   <LogOut className="size-4" />
-                  {t("logout")}
+                  Chiqish
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
