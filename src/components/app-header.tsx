@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -16,7 +17,7 @@ import { UserAvatar } from "@/components/user-avatar";
 import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { InvitationsInbox } from "@/components/invitations-inbox";
-import { LogOut, LayoutDashboard, Languages } from "lucide-react";
+import { LogOut, LayoutDashboard, Languages, Globe } from "lucide-react";
 import { useAuthStore } from "@/store/auth-store";
 import { useDataStore } from "@/store/data-store";
 import { useTranslation } from "@/lib/i18n";
@@ -49,6 +50,20 @@ export function AppHeader({ transparent, sticky = true, children }: Props) {
         <div className="flex items-center gap-1">
           {user && <InvitationsInbox />}
           <ThemeToggle />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => {
+              const locales: Array<"uz" | "ru" | "en"> = ["uz", "ru", "en"];
+              const currentIndex = locales.indexOf(locale);
+              const nextLocale = locales[(currentIndex + 1) % locales.length];
+              setLocale(nextLocale);
+            }}
+            className="size-9"
+            title="Change language"
+          >
+            <Globe className="size-4" />
+          </Button>
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger
