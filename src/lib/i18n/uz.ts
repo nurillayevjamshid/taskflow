@@ -99,4 +99,8 @@ export const uz = {
   returnToBoard: "Doskaga qaytish",
   confirmLeave: "Haqiqatan chiqishni xohlaysizmi?",
   yes: "Xohlayman",
+
+  // Card Dialog
+  unknown: "Noma'lum",
+  descriptionPlaceholder: "Kartaga kontekst, havola yoki eslatma qo'shing…",
 };

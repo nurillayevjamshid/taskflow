@@ -99,4 +99,8 @@ export const ru = {
   returnToBoard: "Вернуться к доске",
   confirmLeave: "Вы действительно хотите выйти?",
   yes: "Да",
+
+  // Card Dialog
+  unknown: "Неизвестно",
+  descriptionPlaceholder: "Добавьте контекст, ссылку или заметку к карточке…",
 };

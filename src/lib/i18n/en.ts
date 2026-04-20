@@ -99,4 +99,8 @@ export const en = {
   returnToBoard: "Return to board",
   confirmLeave: "Are you sure you want to leave?",
   yes: "Yes",
+
+  // Card Dialog
+  unknown: "Unknown",
+  descriptionPlaceholder: "Add context, link, or note to the card…",
 };
