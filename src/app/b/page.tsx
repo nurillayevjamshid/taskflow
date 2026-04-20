@@ -16,6 +16,8 @@ import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { UserAvatar } from "@/components/user-avatar";
 import { MemberPicker } from "@/components/member-picker";
+import { InviteDialog } from "@/components/invite-dialog";
+import { InvitationsInbox } from "@/components/invitations-inbox";
 import { BoardView } from "@/components/kanban/board-view";
 import { Button } from "@/components/ui/button";
 import {
@@ -169,10 +171,24 @@ function BoardPageContent({ boardId }: { boardId: string }) {
                   className="bg-white/15 text-white hover:bg-white/25"
                 >
                   <UserPlus className="size-3.5" />
-                  Taklif
+                  A&apos;zolar
                 </Button>
               }
             />
+            <InviteDialog
+              boardId={board.id}
+              trigger={
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="bg-white/15 text-white hover:bg-white/25"
+                >
+                  <UserPlus className="size-3.5" />
+                  Taklif yuborish
+                </Button>
+              }
+            />
+            <InvitationsInbox variant="onDark" />
             <ThemeToggle />
             <DropdownMenu>
               <DropdownMenuTrigger

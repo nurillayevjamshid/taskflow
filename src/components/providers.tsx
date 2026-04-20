@@ -10,6 +10,7 @@ import { buildStarterContent, writeStarterContent } from "@/lib/seed";
 export function Providers({ children }: { children: ReactNode }) {
   const authHydrated = useAuthStore((s) => s.hydrated);
   const currentUserId = useAuthStore((s) => s.currentUserId);
+  const currentUserEmail = useAuthStore((s) => s.currentUserEmail);
   const dataHydrated = useDataStore((s) => s.hydrated);
 
   // Subscribe to Firebase auth state once on mount.
@@ -39,6 +40,16 @@ export function Providers({ children }: { children: ReactNode }) {
       unsub();
     };
   }, [currentUserId]);
+
+  // Subscribe to invitations addressed to the signed-in user's email so the
+  // notification bell updates in real time across sessions/devices.
+  useEffect(() => {
+    if (!currentUserEmail) return;
+    const unsub = useDataStore
+      .getState()
+      .subscribeInvitations(currentUserEmail);
+    return () => unsub();
+  }, [currentUserEmail]);
 
   // Self-healing: if the signed-in user has no workspaces after Firestore
   // hydrates, seed a starter workspace + board. This covers the case where
