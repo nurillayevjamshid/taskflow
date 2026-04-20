@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useDataStore } from "@/store/data-store";
 import { useAuthStore } from "@/store/auth-store";
 import { buildStarterContent, writeStarterContent } from "@/lib/seed";
+import { I18nProvider } from "@/lib/i18n";
 
 export function Providers({ children }: { children: ReactNode }) {
   const authHydrated = useAuthStore((s) => s.hydrated);
@@ -92,9 +93,11 @@ export function Providers({ children }: { children: ReactNode }) {
   }
 
   return (
-    <TooltipProvider delay={200}>
-      {children}
-      <Toaster richColors position="top-right" closeButton />
-    </TooltipProvider>
+    <I18nProvider>
+      <TooltipProvider delay={200}>
+        {children}
+        <Toaster richColors position="top-right" closeButton />
+      </TooltipProvider>
+    </I18nProvider>
   );
 }
