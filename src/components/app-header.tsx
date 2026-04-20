@@ -20,6 +20,7 @@ import { LanguageSelector } from "@/components/language-selector";
 import { LogOut, LayoutDashboard } from "lucide-react";
 import { useAuthStore } from "@/store/auth-store";
 import { useDataStore } from "@/store/data-store";
+import { useTranslation } from "@/lib/i18n";
 
 interface Props {
   transparent?: boolean;
@@ -34,6 +35,7 @@ export function AppHeader({ transparent, sticky = true, children }: Props) {
   const user = useDataStore((s) =>
     s.users.find((u) => u.id === currentUserId),
   );
+  const { t } = useTranslation();
 
   return (
     <header
@@ -73,7 +75,7 @@ export function AppHeader({ transparent, sticky = true, children }: Props) {
                   className="cursor-pointer"
                 >
                   <LayoutDashboard className="size-4" />
-                  Dashboard
+                  {t("dashboard")}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
@@ -84,7 +86,7 @@ export function AppHeader({ transparent, sticky = true, children }: Props) {
                   className="cursor-pointer text-destructive focus:text-destructive"
                 >
                   <LogOut className="size-4" />
-                  Chiqish
+                  {t("logout")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
