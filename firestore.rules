@@ -11,6 +11,14 @@ service cloud.firestore {
       return isSignedIn() &&
         uid() in get(/databases/$(database)/documents/boards/$(boardId)).data.memberIds;
     }
+    // Like isBoardMember but reads the board doc AFTER the current batch commits.
+    // Used for subcollection *writes* so that creating a board + its first
+    // list/card in the same writeBatch is allowed (the board doc does not yet
+    // exist at rule-check time but will exist once the batch commits).
+    function isBoardMemberAfter(boardId) {
+      return isSignedIn() &&
+        uid() in getAfter(/databases/$(database)/documents/boards/$(boardId)).data.memberIds;
+    }
 
     // Any signed-in user can read user profiles (needed for rendering board
     // members and inviting teammates). Only the owner can write their own doc.
@@ -37,14 +45,22 @@ service cloud.firestore {
       allow update: if isSignedIn() && uid() in resource.data.memberIds;
       allow delete: if isSignedIn() && uid() == resource.data.createdBy;
 
+      // Subcollection reads check the current board doc; writes use `After`
+      // so that batch-creating a board and its first list/card is allowed.
       match /lists/{listId} {
-        allow read, write: if isBoardMember(boardId);
+        allow read: if isBoardMember(boardId);
+        allow create, update: if isBoardMemberAfter(boardId);
+        allow delete: if isBoardMember(boardId) || isBoardMemberAfter(boardId);
       }
       match /cards/{cardId} {
-        allow read, write: if isBoardMember(boardId);
+        allow read: if isBoardMember(boardId);
+        allow create, update: if isBoardMemberAfter(boardId);
+        allow delete: if isBoardMember(boardId) || isBoardMemberAfter(boardId);
       }
       match /comments/{commentId} {
-        allow read, write: if isBoardMember(boardId);
+        allow read: if isBoardMember(boardId);
+        allow create, update: if isBoardMemberAfter(boardId);
+        allow delete: if isBoardMember(boardId) || isBoardMemberAfter(boardId);
       }
     }
   }
