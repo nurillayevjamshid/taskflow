@@ -35,7 +35,7 @@ export function AppHeader({ transparent, sticky = true, children }: Props) {
   const user = useDataStore((s) =>
     s.users.find((u) => u.id === currentUserId),
   );
-  const { locale, setLocale } = useTranslation();
+  const { locale, setLocale, t } = useTranslation();
 
   return (
     <header
@@ -52,11 +52,9 @@ export function AppHeader({ transparent, sticky = true, children }: Props) {
           <ThemeToggle />
           <button
             onClick={() => {
-              console.log("Language button clicked, current locale:", locale);
               const locales: Array<"uz" | "ru" | "en"> = ["uz", "ru", "en"];
               const currentIndex = locales.indexOf(locale);
               const nextLocale = locales[(currentIndex + 1) % locales.length];
-              console.log("Switching to:", nextLocale);
               setLocale(nextLocale);
             }}
             className="size-9 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring flex items-center justify-center hover:bg-accent transition"
@@ -88,7 +86,7 @@ export function AppHeader({ transparent, sticky = true, children }: Props) {
                   className="cursor-pointer"
                 >
                   <LayoutDashboard className="size-4" />
-                  Dashboard
+                  {t("dashboard")}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
@@ -99,7 +97,7 @@ export function AppHeader({ transparent, sticky = true, children }: Props) {
                   className="cursor-pointer text-destructive focus:text-destructive"
                 >
                   <LogOut className="size-4" />
-                  Chiqish
+                  {t("logout")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
