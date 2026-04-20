@@ -1,10 +1,11 @@
 "use client";
 
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useDataStore } from "@/store/data-store";
 import { useAuthStore } from "@/store/auth-store";
+import { buildStarterContent, writeStarterContent } from "@/lib/seed";
 
 export function Providers({ children }: { children: ReactNode }) {
   const authHydrated = useAuthStore((s) => s.hydrated);
@@ -38,6 +39,24 @@ export function Providers({ children }: { children: ReactNode }) {
       unsub();
     };
   }, [currentUserId]);
+
+  // Self-healing: if the signed-in user has no workspaces after Firestore
+  // hydrates, seed a starter workspace + board. This covers the case where
+  // the registration-time batch write failed (e.g. rule misconfiguration) and
+  // the user would otherwise be stuck with an empty dashboard.
+  const seedingAttempted = useRef<string | null>(null);
+  useEffect(() => {
+    if (!currentUserId || !dataHydrated) return;
+    if (seedingAttempted.current === currentUserId) return;
+    const workspaces = useDataStore.getState().workspaces;
+    if (workspaces.length === 0) {
+      seedingAttempted.current = currentUserId;
+      writeStarterContent(buildStarterContent(currentUserId)).catch(() => {
+        // If the retry itself fails (rules still denying, offline, etc.) leave
+        // the dashboard empty rather than spamming retries.
+      });
+    }
+  }, [currentUserId, dataHydrated]);
 
   // Keep a visible shell while Firebase auth is figuring out the session.
   // Unauthenticated pages (landing/login/register) don't need `dataHydrated`.
