@@ -83,24 +83,5 @@ export const en = {
   labelName: "Name",
   cardMembers: "Card Members",
   star: "Add to Starred",
-  unstar: "Remove from Starred",
-
-  // Dashboard
-  welcome: "Welcome,",
-  dashboardDescription: "Manage your boards in one place. Organize your projects column by column, work with your team, and get things done.",
-  starredBoards: "Starred Boards",
-  addBoard: "Add Board",
-  emptyWorkspace: "There are no boards in this workspace yet. Create the first one using the button above.",
-  noWorkspace: "No workspace yet",
-  workspaceDescription: "A workspace stores your team's collection of boards in one place.",
-
-  // Board Card
-  leftBoard: "You left the board",
-  returnToBoard: "Return to board",
-  confirmLeave: "Are you sure you want to leave?",
-  yes: "Yes",
-
-  // Card Dialog
-  unknown: "Unknown",
-  descriptionPlaceholder: "Add context, link, or note to the card…",
+  unstar: "Unstar",
 };

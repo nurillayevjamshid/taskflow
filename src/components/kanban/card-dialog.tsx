@@ -33,7 +33,6 @@ import type { LabelColor } from "@/lib/types";
 import { useDataStore } from "@/store/data-store";
 import { useAuthStore } from "@/store/auth-store";
 import { cn } from "@/lib/utils";
-import { useTranslation } from "@/lib/i18n";
 
 interface Props {
   cardId: string | null;
@@ -67,7 +66,6 @@ export function CardDialog({ cardId, open, onClose }: Props) {
   const deleteComment = useDataStore((s) => s.deleteComment);
   const sendCardToReview = useDataStore((s) => s.sendCardToReview);
   const currentUserId = useAuthStore((s) => s.currentUserId);
-  const { t } = useTranslation();
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -113,7 +111,7 @@ export function CardDialog({ cardId, open, onClose }: Props) {
       <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl scrollbar-thin">
         <DialogHeader className="pr-8">
           <div className="text-xs text-muted-foreground">
-            {list?.name} {t("inColumn")}
+            {list?.name} ustunida
           </div>
           <DialogTitle>
             <Input
@@ -131,7 +129,7 @@ export function CardDialog({ cardId, open, onClose }: Props) {
             <section>
               <div className="mb-2 flex items-center gap-2 text-sm font-semibold">
                 <Users className="size-4" />
-                {t("members")}
+                A'zolar
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 {assignedMembers.map((m) => (
@@ -144,7 +142,7 @@ export function CardDialog({ cardId, open, onClose }: Props) {
                     <button
                       onClick={() => toggleCardMember(card.id, m.id)}
                       className="text-muted-foreground hover:text-destructive"
-                      aria-label={`${m.name} ${t("removeMember")}`}
+                      aria-label={`${m.name} ni olib tashlash`}
                     >
                       <X className="size-3" />
                     </button>
@@ -154,11 +152,11 @@ export function CardDialog({ cardId, open, onClose }: Props) {
                   allUsers={boardMembers}
                   selectedIds={card.memberIds}
                   onToggle={(uid) => toggleCardMember(card.id, uid)}
-                  title={t("cardMembers")}
+                  title="Karta a'zolari"
                   trigger={
                     <Button size="sm" variant="outline" className="gap-1.5">
                       <UserPlus className="size-3.5" />
-                      {t("assign")}
+                      Biriktirish
                     </Button>
                   }
                 />
@@ -168,7 +166,7 @@ export function CardDialog({ cardId, open, onClose }: Props) {
             <section>
               <div className="mb-2 flex items-center gap-2 text-sm font-semibold">
                 <Tag className="size-4" />
-                {t("labels")}
+                Yorliqlar
               </div>
               <div className="flex flex-wrap gap-2">
                 {card.labels.map((l) => {
@@ -183,7 +181,7 @@ export function CardDialog({ cardId, open, onClose }: Props) {
                       <button
                         onClick={() => removeCardLabel(card.id, l.id)}
                         className="opacity-70 transition hover:opacity-100"
-                        aria-label={t("removeLabel")}
+                        aria-label="Yorliqni o'chirish"
                       >
                         <X className="size-3" />
                       </button>
@@ -197,7 +195,7 @@ export function CardDialog({ cardId, open, onClose }: Props) {
             <section>
               <div className="mb-2 flex items-center gap-2 text-sm font-semibold">
                 <Calendar className="size-4" />
-                {t("startAt")}
+                Boshlanish vaqti
               </div>
               <div className="flex items-center gap-2">
                 <Input
@@ -221,7 +219,7 @@ export function CardDialog({ cardId, open, onClose }: Props) {
                     variant="ghost"
                     onClick={() => updateCard(card.id, { startAt: null })}
                   >
-                    {t("clear")}
+                    Tozalash
                   </Button>
                 )}
               </div>
@@ -230,7 +228,7 @@ export function CardDialog({ cardId, open, onClose }: Props) {
             <section>
               <div className="mb-2 flex items-center gap-2 text-sm font-semibold">
                 <Calendar className="size-4" />
-                {t("deadline")}
+                Muddat
               </div>
               <div className="flex items-center gap-2">
                 <Input
@@ -254,7 +252,7 @@ export function CardDialog({ cardId, open, onClose }: Props) {
                     variant="ghost"
                     onClick={() => updateCard(card.id, { dueDate: null })}
                   >
-                    {t("clear")}
+                    Tozalash
                   </Button>
                 )}
                 <label className="ml-auto inline-flex items-center gap-2 text-xs text-muted-foreground">
@@ -266,20 +264,20 @@ export function CardDialog({ cardId, open, onClose }: Props) {
                     }
                     className="size-4 accent-primary"
                   />
-                  {t("completed")}
+                  Bajarildi
                 </label>
               </div>
             </section>
 
             <section>
               <UILabel htmlFor="desc" className="text-sm font-semibold">
-                {t("description")}
+                Tavsif
               </UILabel>
               <Textarea
                 id="desc"
                 rows={5}
                 className="mt-2"
-                placeholder={t("descriptionPlaceholder")}
+                placeholder="Kartaga kontekst, havola yoki eslatma qo'shing…"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 onBlur={saveDescription}
@@ -289,7 +287,7 @@ export function CardDialog({ cardId, open, onClose }: Props) {
             <section>
               <div className="mb-2 flex items-center gap-2 text-sm font-semibold">
                 <CheckSquare className="size-4" />
-                {t("comments")}
+                Izohlar
               </div>
               <form
                 onSubmit={(e) => {
@@ -302,7 +300,7 @@ export function CardDialog({ cardId, open, onClose }: Props) {
               >
                 <Textarea
                   rows={2}
-                  placeholder={t("addComment")}
+                  placeholder="Izoh yozing…"
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
                   className="flex-1"
@@ -314,13 +312,13 @@ export function CardDialog({ cardId, open, onClose }: Props) {
                   }}
                 />
                 <Button type="submit" disabled={!commentText.trim()}>
-                  {t("submit")}
+                  Yuborish
                 </Button>
               </form>
               <div className="mt-4 space-y-3">
                 {comments.length === 0 && (
                   <p className="text-xs text-muted-foreground">
-                    {t("noComments")}
+                    Hali izohlar yo'q.
                   </p>
                 )}
                 {comments.map((cm) => {
@@ -331,7 +329,7 @@ export function CardDialog({ cardId, open, onClose }: Props) {
                       <div className="flex-1">
                         <div className="flex items-baseline gap-2">
                           <span className="text-sm font-medium">
-                            {author?.name ?? t("unknown")}
+                            {author?.name ?? "Noma'lum"}
                           </span>
                           <span className="text-xs text-muted-foreground">
                             {format(cm.createdAt, "dd MMM, HH:mm")}
@@ -341,7 +339,7 @@ export function CardDialog({ cardId, open, onClose }: Props) {
                               onClick={() => deleteComment(cm.id)}
                               className="ml-auto text-xs text-muted-foreground hover:text-destructive"
                             >
-                              {t("delete")}
+                              O'chirish
                             </button>
                           )}
                         </div>
@@ -362,11 +360,11 @@ export function CardDialog({ cardId, open, onClose }: Props) {
                 className="w-full"
                 onClick={() => sendCardToReview(card.id)}
               >
-                {t("sendToReview")}
+                Tekshiruvga yuborish
               </Button>
             )}
             <div className="rounded-xl border border-border bg-muted/30 p-3 text-xs text-muted-foreground">
-              {t("addedOn")}:{" "}
+              Qo'shilgan:{" "}
               <span className="font-medium text-foreground">
                 {format(card.createdAt, "dd MMM yyyy")}
               </span>
@@ -377,7 +375,7 @@ export function CardDialog({ cardId, open, onClose }: Props) {
               onClick={handleDelete}
             >
               <Trash2 className="size-4" />
-              {t("deleteCard")}
+              Kartani o'chirish
             </Button>
           </aside>
         </div>
@@ -396,7 +394,6 @@ function AddLabel({
   const [name, setName] = useState("");
   const [color, setColor] = useState<LabelColor>("violet");
   const [open, setOpen] = useState(false);
-  const { t } = useTranslation();
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -404,17 +401,17 @@ function AddLabel({
         render={
           <Button size="sm" variant="outline" className="gap-1">
             <Tag className="size-3.5" />
-            {t("add")}
+            Qo'shish
           </Button>
         }
       />
       <PopoverContent className="w-64 p-3">
-        <div className="text-sm font-semibold">{t("newLabel")}</div>
+        <div className="text-sm font-semibold">Yangi yorliq</div>
         <div className="mt-2 space-y-2">
           <Input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder={t("labelName")}
+            placeholder="Nomi"
           />
           <div className="grid grid-cols-7 gap-1.5">
             {(Object.keys(LABEL_COLORS) as LabelColor[]).map((c) => (
@@ -434,15 +431,14 @@ function AddLabel({
           </div>
           <Button
             size="sm"
-            className="w-full"
-            disabled={!name.trim()}
             onClick={() => {
-              onAdd(cardId, { name: name.trim(), color });
+              if (!name.trim()) return;
+              onAdd(cardId, { name, color });
               setName("");
               setOpen(false);
             }}
           >
-            {t("add")}
+            Qo'shish
           </Button>
         </div>
       </PopoverContent>

@@ -17,7 +17,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { useTranslation } from "@/lib/i18n";
 
 export function BoardCard({ board }: { board: Board }) {
   const users = useDataStore((s) => s.users);
@@ -27,7 +26,6 @@ export function BoardCard({ board }: { board: Board }) {
   const leaveBoard = useDataStore((s) => s.leaveBoard);
   const addBoardMember = useDataStore((s) => s.addBoardMember);
   const currentUserId = useAuthStore((s) => s.currentUserId);
-  const { t } = useTranslation();
 
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [countdown, setCountdown] = useState<number | null>(null);
@@ -70,10 +68,10 @@ export function BoardCard({ board }: { board: Board }) {
       <div className="relative block overflow-hidden rounded-2xl border border-border bg-card p-4">
         <div className="text-center">
           <p className="text-sm text-muted-foreground mb-3">
-            {t("leftBoard")}
+            Doskadan chiqdingiz
           </p>
           <Button onClick={handleUndoLeave} className="w-full">
-            {t("returnToBoard")} ({countdown}s)
+            Doskaga qaytish ({countdown}s)
           </Button>
         </div>
       </div>
@@ -98,7 +96,7 @@ export function BoardCard({ board }: { board: Board }) {
               toggleStar(board.id);
             }}
             className="grid size-8 place-items-center rounded-full bg-white/15 backdrop-blur transition hover:bg-white/25"
-            aria-label={board.starred ? t("unstar") : t("star")}
+            aria-label={board.starred ? "Yulduzchani olib tashlash" : "Yulduzchaga qo'shish"}
           >
             <Star
               className={cn(
@@ -124,7 +122,7 @@ export function BoardCard({ board }: { board: Board }) {
                 className="cursor-pointer text-destructive focus:text-destructive"
               >
                 <LogOut className="size-4 mr-2" />
-                {t("leaveBoard")}
+                Doskadan chiqish
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -133,7 +131,7 @@ export function BoardCard({ board }: { board: Board }) {
       <div className="p-4">
         <div className="truncate text-base font-semibold">{board.name}</div>
         <div className="mt-1 text-xs text-muted-foreground">
-          {listCount} {t("columns")} · {cardCount} {t("cardsCount")}
+          {listCount} ustun · {cardCount} karta
         </div>
         <div className="mt-3 flex -space-x-2">
           {members.slice(0, 5).map((m) => (
@@ -150,16 +148,16 @@ export function BoardCard({ board }: { board: Board }) {
       {showLeaveConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="rounded-xl bg-card p-6 shadow-lg max-w-sm mx-4">
-            <h3 className="text-lg font-semibold mb-2">{t("leaveBoard")}</h3>
+            <h3 className="text-lg font-semibold mb-2">Doskadan chiqish</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              {t("confirmLeave")}
+              Haqiqatan chiqishni xohlaysizmi?
             </p>
             <div className="flex gap-2 justify-end">
               <Button
                 variant="outline"
                 onClick={() => setShowLeaveConfirm(false)}
               >
-                {t("cancel")}
+                Bekor qilish
               </Button>
               <Button
                 variant="destructive"
@@ -168,7 +166,7 @@ export function BoardCard({ board }: { board: Board }) {
                   setShowLeaveConfirm(false);
                 }}
               >
-                {t("yes")}
+                Xohlayman
               </Button>
             </div>
           </div>

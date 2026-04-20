@@ -20,7 +20,6 @@ import type { Card, List } from "@/lib/types";
 import { useDataStore } from "@/store/data-store";
 import { useAuthStore } from "@/store/auth-store";
 import { cn } from "@/lib/utils";
-import { useTranslation } from "@/lib/i18n";
 
 interface Props {
   list: List;
@@ -32,7 +31,6 @@ export function ListColumn({ list, cards, onOpenCard }: Props) {
   const [adding, setAdding] = useState(false);
   const [newCard, setNewCard] = useState("");
   const [colorPickerOpen, setColorPickerOpen] = useState(false);
-  const { t } = useTranslation();
 
   const setListColor = useDataStore((s) => s.setListColor);
   const createCard = useDataStore((s) => s.createCard);
@@ -129,7 +127,7 @@ export function ListColumn({ list, cards, onOpenCard }: Props) {
               rows={2}
               value={newCard}
               onChange={(e) => setNewCard(e.target.value)}
-              placeholder={t("cardTitle")}
+              placeholder="Karta sarlavhasi"
               className="mb-2 resize-none"
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
@@ -148,7 +146,7 @@ export function ListColumn({ list, cards, onOpenCard }: Props) {
                 onClick={handleAdd}
                 disabled={!newCard.trim()}
               >
-                {t("add")}
+                Qo'shish
               </Button>
               <Button
                 size="sm"
@@ -158,7 +156,7 @@ export function ListColumn({ list, cards, onOpenCard }: Props) {
                   setNewCard("");
                 }}
               >
-                {t("cancel")}
+                Bekor
               </Button>
             </div>
           </div>
@@ -168,7 +166,7 @@ export function ListColumn({ list, cards, onOpenCard }: Props) {
             className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-muted-foreground transition hover:bg-muted hover:text-foreground"
           >
             <Plus className="size-4" />
-            {t("createCard")}
+            Karta qo'shish
           </button>
         )}
       </div>

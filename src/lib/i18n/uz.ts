@@ -84,23 +84,4 @@ export const uz = {
   cardMembers: "Karta a'zolari",
   star: "Yulduzchaga qo'shish",
   unstar: "Yulduzchani olib tashlash",
-
-  // Dashboard
-  welcome: "Xush kelibsiz,",
-  dashboardDescription: "Doskalaringizni bir joydan boshqaring. Loyihalaringizni ustun-ustun qilib tartibga soling, jamoa bilan ishlang va oxiriga yetkazing.",
-  starredBoards: "Yulduzchali doskalar",
-  addBoard: "Doska qo'shish",
-  emptyWorkspace: "Bu ish maydonida hali doska yo'q. Yuqoridagi tugma orqali birinchisini yarating.",
-  noWorkspace: "Hali ish maydoni yo'q",
-  workspaceDescription: "Ish maydoni jamoangiz uchun doskalar to'plamini bitta joyda saqlaydi.",
-
-  // Board Card
-  leftBoard: "Doskadan chiqdingiz",
-  returnToBoard: "Doskaga qaytish",
-  confirmLeave: "Haqiqatan chiqishni xohlaysizmi?",
-  yes: "Xohlayman",
-
-  // Card Dialog
-  unknown: "Noma'lum",
-  descriptionPlaceholder: "Kartaga kontekst, havola yoki eslatma qo'shing…",
 };
