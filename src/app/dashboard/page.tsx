@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/auth-store";
 import { useDataStore } from "@/store/data-store";
 import { UserAvatar } from "@/components/user-avatar";
+import { useTranslation } from "@/lib/i18n";
 
 export default function DashboardPage() {
   return (
@@ -26,6 +27,7 @@ function DashboardContent() {
   const workspaces = useDataStore((s) => s.workspaces);
   const boards = useDataStore((s) => s.boards);
   const user = users.find((u) => u.id === currentUserId);
+  const { t } = useTranslation();
 
   const myWorkspaces = useMemo(
     () => workspaces.filter((w) => w.memberIds.includes(currentUserId)),
@@ -62,7 +64,7 @@ function DashboardContent() {
               {user && <UserAvatar user={user} size="lg" />}
               <div>
                 <p className="text-sm text-muted-foreground">
-                  Xush kelibsiz,
+                  {t("welcome")}
                 </p>
                 <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
                   {user?.name ?? ""}
@@ -70,9 +72,7 @@ function DashboardContent() {
               </div>
             </div>
             <p className="mt-3 max-w-xl text-sm text-muted-foreground">
-              Doskalaringizni bir joydan boshqaring. Loyihalaringizni
-              ustun-ustun qilib tartibga soling, jamoa bilan ishlang va oxiriga
-              yetkazing.
+              {t("dashboardDescription")}
             </p>
           </div>
           <div className="flex gap-2">
@@ -86,7 +86,7 @@ function DashboardContent() {
             <div className="mb-4 flex items-center gap-2">
               <Star className="size-4 fill-amber-400 text-amber-400" />
               <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                Yulduzchali doskalar
+                {t("starredBoards")}
               </h2>
             </div>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -130,7 +130,7 @@ function DashboardContent() {
                         workspaceId={w.id}
                         trigger={
                           <Button size="sm" variant="outline">
-                            Doska qo&apos;shish
+                            {t("addBoard")}
                           </Button>
                         }
                       />
@@ -138,8 +138,7 @@ function DashboardContent() {
                   </div>
                   {wBoards.length === 0 ? (
                     <div className="rounded-2xl border border-dashed border-border bg-card/50 p-8 text-center text-sm text-muted-foreground">
-                      Bu ish maydonida hali doska yo&apos;q. Yuqoridagi tugma
-                      orqali birinchisini yarating.
+                      {t("emptyWorkspace")}
                     </div>
                   ) : (
                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -159,15 +158,15 @@ function DashboardContent() {
 }
 
 function EmptyState() {
+  const { t } = useTranslation();
   return (
     <div className="rounded-3xl border border-dashed border-border bg-card/50 p-10 text-center">
       <div className="mx-auto grid size-12 place-items-center rounded-2xl bg-gradient-to-br from-primary/20 to-fuchsia-500/10 text-primary">
         <LayoutGrid className="size-5" />
       </div>
-      <h3 className="mt-4 text-lg font-semibold">Hali ish maydoni yo&apos;q</h3>
+      <h3 className="mt-4 text-lg font-semibold">{t("noWorkspace")}</h3>
       <p className="mx-auto mt-1 max-w-sm text-sm text-muted-foreground">
-        Ish maydoni jamoangiz uchun doskalar to&apos;plamini bitta joyda
-        saqlaydi.
+        {t("workspaceDescription")}
       </p>
       <div className="mt-6 flex justify-center gap-2">
         <CreateWorkspaceDialog />
