@@ -51,12 +51,10 @@ export function AppHeader({ transparent, sticky = true, children }: Props) {
           <ThemeToggle />
           {user ? (
             <DropdownMenu>
-              <DropdownMenuTrigger
-                render={
-                  <button className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring" />
-                }
-              >
-                <UserAvatar user={user} size="md" ring />
+              <DropdownMenuTrigger>
+                <button className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                  <UserAvatar user={user} size="md" ring />
+                </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuGroup>
