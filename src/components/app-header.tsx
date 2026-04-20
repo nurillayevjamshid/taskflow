@@ -51,11 +51,13 @@ export function AppHeader({ transparent, sticky = true, children }: Props) {
           <ThemeToggle />
           {user ? (
             <DropdownMenu>
-              <DropdownMenuTrigger>
-                <button className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                  <UserAvatar user={user} size="md" ring />
-                </button>
-              </DropdownMenuTrigger>
+              <DropdownMenuTrigger
+                render={
+                  <button className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                    <UserAvatar user={user} size="md" ring />
+                  </button>
+                }
+              />
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuGroup>
                   <DropdownMenuLabel className="flex flex-col">
@@ -72,29 +74,6 @@ export function AppHeader({ transparent, sticky = true, children }: Props) {
                 >
                   <LayoutDashboard className="size-4" />
                   Dashboard
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuLabel className="flex items-center gap-2">
-                  <Languages className="size-4" />
-                  Til
-                </DropdownMenuLabel>
-                <DropdownMenuItem
-                  onClick={() => setLocale("uz")}
-                  className={locale === "uz" ? "bg-muted" : "cursor-pointer"}
-                >
-                  O&apos;zbek tili
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => setLocale("ru")}
-                  className={locale === "ru" ? "bg-muted" : "cursor-pointer"}
-                >
-                  Русский язык
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => setLocale("en")}
-                  className={locale === "en" ? "bg-muted" : "cursor-pointer"}
-                >
-                  English
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
