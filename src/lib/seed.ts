@@ -20,7 +20,7 @@ export function buildDemoSeed(): Seed {
   const alice: User = {
     id: "u_demo_alice",
     name: "Alisher Karimov",
-    email: "alisher@taskflow.demo",
+    email: "alisher@taskly.demo",
     passwordHash: DEMO_PASSWORD_HASH,
     avatarColor: pickAvatarColor("alisher"),
     createdAt: now,
@@ -28,7 +28,7 @@ export function buildDemoSeed(): Seed {
   const bob: User = {
     id: "u_demo_bob",
     name: "Bekzod Yo'ldoshev",
-    email: "bekzod@taskflow.demo",
+    email: "bekzod@taskly.demo",
     passwordHash: DEMO_PASSWORD_HASH,
     avatarColor: pickAvatarColor("bekzod"),
     createdAt: now,
@@ -36,7 +36,7 @@ export function buildDemoSeed(): Seed {
   const mira: User = {
     id: "u_demo_mira",
     name: "Mira Rashidova",
-    email: "mira@taskflow.demo",
+    email: "mira@taskly.demo",
     passwordHash: DEMO_PASSWORD_HASH,
     avatarColor: pickAvatarColor("mira"),
     createdAt: now,
@@ -71,7 +71,7 @@ export function buildStarterContent(ownerId: string): {
     id: makeId(),
     workspaceId: workspace.id,
     name: "Boshlash uchun doska",
-    description: "TaskFlow bilan ishni boshlash uchun namuna doska",
+    description: "Taskly bilan ishni boshlash uchun namuna doska",
     background: "gradient-violet",
     memberIds: [ownerId],
     createdBy: ownerId,
@@ -130,7 +130,7 @@ export function buildStarterContent(ownerId: string): {
   const cards: Card[] = [
     card(
       l1.id,
-      "TaskFlow bilan tanishish",
+      "Taskly bilan tanishish",
       "Ushbu doskani o'zingizga moslang: ustun qo'shing, kartalarni ko'chiring, a'zolarni taklif qiling.",
       0,
       {

@@ -68,7 +68,7 @@ export default function Home() {
               <span className="text-gradient">bir maromda</span> harakat qiling.
             </h1>
             <p className="mt-6 text-pretty text-base text-muted-foreground sm:text-lg">
-              TaskFlow — bu Trello va Atlassian uslubidagi doska va kartalar
+              Taskly — bu Trello va Atlassian uslubidagi doska va kartalar
               yordamida loyihalarni tartibga soluvchi zamonaviy ish maydoni.
               Tez, chiroyli va premium.
             </p>
@@ -115,7 +115,7 @@ export default function Home() {
                 <span className="size-2.5 rounded-full bg-amber-400/80" />
                 <span className="size-2.5 rounded-full bg-emerald-400/80" />
                 <span className="ml-3 text-xs text-muted-foreground">
-                  taskflow.app / b / marketing-launch
+                  taskly.uz / b / marketing-launch
                 </span>
               </div>
               <div className="grid grid-cols-3 gap-3 p-4 sm:gap-4 sm:p-6">
@@ -223,7 +223,7 @@ export default function Home() {
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-6 sm:flex-row sm:px-6">
           <Logo size="sm" />
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} TaskFlow. Hamma huquqlar himoyalangan.
+            © {new Date().getFullYear()} Taskly. Hamma huquqlar himoyalangan.
           </p>
         </div>
       </footer>

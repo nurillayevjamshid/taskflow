@@ -1,7 +1,7 @@
 // Simple SHA-256 hashing via Web Crypto. Used to avoid storing plain-text
 // passwords in localStorage for this demo. Not suitable for production security.
 export async function hashPassword(password: string): Promise<string> {
-  const enc = new TextEncoder().encode(`taskflow::${password}`);
+  const enc = new TextEncoder().encode(`taskly::${password}`);
   const buf = await crypto.subtle.digest("SHA-256", enc);
   return Array.from(new Uint8Array(buf))
     .map((b) => b.toString(16).padStart(2, "0"))

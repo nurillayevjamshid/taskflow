@@ -17,7 +17,7 @@ export function Providers({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Apply theme from localStorage on first paint
-    const stored = localStorage.getItem("taskflow:theme");
+    const stored = localStorage.getItem("taskly:theme");
     const dark =
       stored === "dark" ||
       (!stored && window.matchMedia("(prefers-color-scheme: dark)").matches);

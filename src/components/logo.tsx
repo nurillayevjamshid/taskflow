@@ -1,6 +1,22 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
+export function TasklyMark({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 100 100"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <rect x="22" y="10" width="14" height="35" rx="7" />
+      <rect x="40" y="10" width="16" height="78" rx="8" />
+      <rect x="61" y="10" width="13" height="20" rx="6.5" />
+    </svg>
+  );
+}
+
 export function Logo({
   className,
   href = "/",
@@ -16,25 +32,13 @@ export function Logo({
       : size === "sm"
         ? "text-base"
         : "text-xl";
-  const dot =
+  const mark =
     size === "lg" ? "size-8" : size === "sm" ? "size-5" : "size-7";
   const content = (
     <span className={cn("flex items-center gap-2 font-semibold", className)}>
-      <span
-        className={cn(
-          "relative grid place-items-center rounded-xl shadow-premium",
-          dot,
-        )}
-        style={{
-          background:
-            "linear-gradient(135deg, oklch(0.62 0.22 283), oklch(0.68 0.2 340))",
-        }}
-      >
-        <span className="size-1.5 rounded-full bg-white/90" />
-        <span className="absolute inset-0 rounded-xl ring-1 ring-inset ring-white/20" />
-      </span>
+      <TasklyMark className={cn(mark, "text-[#0E9BB5]")} />
       <span className={cn(text, "tracking-tight")}>
-        Task<span className="text-gradient">Flow</span>
+        Task<span className="text-gradient">ly</span>
       </span>
     </span>
   );

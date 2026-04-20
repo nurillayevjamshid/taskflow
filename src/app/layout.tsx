@@ -14,9 +14,16 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TaskFlow — jamoa uchun premium task manager",
+  title: "Taskly — jamoa uchun premium task manager",
   description:
-    "TaskFlow — Trello va Atlassian uslubidagi doska, ustun va kartalar bilan jamoa ishini oson boshqaring.",
+    "Taskly — Trello va Atlassian uslubidagi doska, ustun va kartalar bilan jamoa ishini oson boshqaring.",
+  icons: {
+    icon: [
+      { url: "/logo.svg", type: "image/svg+xml" },
+      { url: "/logo.png", type: "image/png" },
+    ],
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({
