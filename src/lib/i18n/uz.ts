@@ -93,4 +93,10 @@ export const uz = {
   emptyWorkspace: "Bu ish maydonida hali doska yo'q. Yuqoridagi tugma orqali birinchisini yarating.",
   noWorkspace: "Hali ish maydoni yo'q",
   workspaceDescription: "Ish maydoni jamoangiz uchun doskalar to'plamini bitta joyda saqlaydi.",
+
+  // Board Card
+  leftBoard: "Doskadan chiqdingiz",
+  returnToBoard: "Doskaga qaytish",
+  confirmLeave: "Haqiqatan chiqishni xohlaysizmi?",
+  yes: "Xohlayman",
 };

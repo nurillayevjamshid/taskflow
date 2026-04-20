@@ -93,4 +93,10 @@ export const en = {
   emptyWorkspace: "There are no boards in this workspace yet. Create the first one using the button above.",
   noWorkspace: "No workspace yet",
   workspaceDescription: "A workspace stores your team's collection of boards in one place.",
+
+  // Board Card
+  leftBoard: "You left the board",
+  returnToBoard: "Return to board",
+  confirmLeave: "Are you sure you want to leave?",
+  yes: "Yes",
 };
