@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   DndContext,
   DragEndEvent,
@@ -38,6 +38,8 @@ export function BoardView({ boardId }: Props) {
   const reorderLists = useDataStore((s) => s.reorderLists);
   const moveCard = useDataStore((s) => s.moveCard);
   const createList = useDataStore((s) => s.createList);
+  const migrateBoard = useDataStore((s) => s.migrateBoard);
+  const reconcileCards = useDataStore((s) => s.reconcileCards);
 
   const [activeId, setActiveId] = useState<string | null>(null);
   const [openCardId, setOpenCardId] = useState<string | null>(null);
@@ -67,6 +69,20 @@ export function BoardView({ boardId }: Props) {
     }
     return map;
   }, [allCards, lists]);
+
+  // Migrate old boards to new 5-column structure
+  useEffect(() => {
+    migrateBoard(boardId);
+  }, [boardId, migrateBoard]);
+
+  // Auto-reconcile cards every 30 seconds (startAt, dueDate checks)
+  useEffect(() => {
+    reconcileCards();
+    const interval = setInterval(() => {
+      reconcileCards();
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [reconcileCards]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
