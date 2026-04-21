@@ -183,7 +183,7 @@ export function BoardView({ boardId }: Props) {
 
         <DragOverlay>
           {activeCard ? (
-            <div className="w-72 rotate-2">
+            <div className="w-64 rotate-2">
               <KanbanCard card={activeCard} onOpen={() => {}} />
             </div>
           ) : null}

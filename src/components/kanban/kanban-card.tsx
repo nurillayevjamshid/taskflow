@@ -52,7 +52,7 @@ export function KanbanCard({
       {...attributes}
       {...listeners}
       className={cn(
-        "group relative cursor-grab touch-none rounded-lg border border-border bg-white p-2 shadow-sm transition hover:border-primary/30 hover:shadow active:cursor-grabbing",
+        "group relative cursor-grab touch-none w-full rounded-lg border border-slate-300 bg-white p-2 shadow-sm transition hover:border-slate-400 hover:shadow active:cursor-grabbing",
         isDragging && "opacity-50 rotate-2",
         card.completed && "opacity-75",
       )}
