@@ -2,7 +2,7 @@ export const uz = {
   // Column names
   planned: "Rejada",
   in_progress: "Jarayonda",
-  review: "Ko'rib chiqilmoqda",
+  review: "Tekshiruvda",
   done: "Bajarildi",
   failed: "Bajarilmadi",
 

@@ -35,7 +35,7 @@ export function buildStarterContent(ownerId: string): StarterContent {
   const lists: List[] = [
     { id: "l_" + makeId(), boardId: board.id, name: "Rejada", position: 0, kind: "planned", createdAt: now },
     { id: "l_" + makeId(), boardId: board.id, name: "Jarayonda", position: 1, kind: "in_progress", createdAt: now },
-    { id: "l_" + makeId(), boardId: board.id, name: "Ko'rib chiqilmoqda", position: 2, kind: "review", createdAt: now },
+    { id: "l_" + makeId(), boardId: board.id, name: "Tekshiruvda", position: 2, kind: "review", createdAt: now },
     { id: "l_" + makeId(), boardId: board.id, name: "Bajarildi", position: 3, kind: "done", createdAt: now },
     { id: "l_" + makeId(), boardId: board.id, name: "Bajarilmadi", position: 4, kind: "failed", createdAt: now },
   ];

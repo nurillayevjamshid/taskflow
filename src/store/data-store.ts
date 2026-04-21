@@ -362,7 +362,7 @@ export const useDataStore = create<DataState>()((set, get) => ({
     const defaults: List[] = [
       { id: "l_" + makeId(), boardId: b.id, name: "Rejada", position: 0, kind: "planned", createdAt: now },
       { id: "l_" + makeId(), boardId: b.id, name: "Jarayonda", position: 1, kind: "in_progress", createdAt: now },
-      { id: "l_" + makeId(), boardId: b.id, name: "Ko'rib chiqilmoqda", position: 2, kind: "review", createdAt: now },
+      { id: "l_" + makeId(), boardId: b.id, name: "Tekshiruvda", position: 2, kind: "review", createdAt: now },
       { id: "l_" + makeId(), boardId: b.id, name: "Bajarildi", position: 3, kind: "done", createdAt: now },
       { id: "l_" + makeId(), boardId: b.id, name: "Bajarilmadi", position: 4, kind: "failed", createdAt: now },
     ];
@@ -431,21 +431,21 @@ export const useDataStore = create<DataState>()((set, get) => ({
       let kind: "planned" | "in_progress" | "review" | "done" | "failed" = "planned";
       if (list.name === "Jarayonda") kind = "in_progress";
       else if (list.name === "Bajarildi") kind = "done";
-      else if (list.name === "Ko'rib chiqilmoqda") kind = "review";
+      else if (list.name === "Tekshiruvda") kind = "review";
       else if (list.name === "Bajarilmadi") kind = "failed";
       
       batch.update(doc(db, "boards", boardId, "lists", list.id), { kind });
     });
     
     // Add missing columns if they don't exist
-    const hasReview = boardLists.some((l) => l.name === "Ko'rib chiqilmoqda" || l.kind === "review");
+    const hasReview = boardLists.some((l) => l.name === "Tekshiruvda" || l.kind === "review");
     const hasFailed = boardLists.some((l) => l.name === "Bajarilmadi" || l.kind === "failed");
     
     if (!hasReview) {
       const reviewList: List = {
         id: "l_" + makeId(),
         boardId,
-        name: "Ko'rib chiqilmoqda",
+        name: "Tekshiruvda",
         position: 2,
         kind: "review",
         createdAt: now,
