@@ -170,7 +170,7 @@ export function BoardView({ boardId }: Props) {
         onDragOver={onDragOver}
         onDragEnd={onDragEnd}
       >
-        <div className="flex h-full gap-4 overflow-x-auto scrollbar-thin px-4 pb-6 sm:px-6">
+        <div className="flex h-full gap-3 overflow-x-auto px-4 pb-4 pt-2">
           {lists.map((list) => (
             <ListColumn
               key={list.id}

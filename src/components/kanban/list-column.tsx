@@ -58,24 +58,24 @@ export function ListColumn({ list, cards, onOpenCard }: Props) {
   return (
     <div
       className={cn(
-        "flex h-full max-h-full w-80 shrink-0 flex-col rounded-2xl border border-white/10 bg-background/80 backdrop-blur-md transition",
-        list.color && "border-2",
+        "flex h-full max-h-full w-72 shrink-0 flex-col rounded-xl bg-slate-100/90 shadow-sm transition",
+        list.color && "ring-2 ring-offset-2",
       )}
-      style={list.color ? { borderColor: list.color } : undefined}
+      style={list.color ? { ringColor: list.color } : undefined}
     >
-      <div className="flex items-center gap-1 p-2">
-        <div className="flex-1 truncate px-2 py-1 text-sm font-semibold">
+      <div className="flex items-center gap-2 px-3 py-2">
+        <div className="flex-1 truncate text-sm font-semibold text-slate-800">
           {list.name}
         </div>
-        <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+        <span className="rounded-full bg-slate-200 px-2 py-0.5 text-xs font-medium text-slate-600">
           {cards.length}
         </span>
         {isAdmin && (
           <DropdownMenu open={colorPickerOpen} onOpenChange={setColorPickerOpen}>
             <DropdownMenuTrigger
               render={
-                <Button size="icon" variant="ghost" className="size-7">
-                  <Palette className="size-4" />
+                <Button size="icon" variant="ghost" className="size-7 hover:bg-slate-200">
+                  <Palette className="size-4 text-slate-500" />
                 </Button>
               }
             />
@@ -105,8 +105,8 @@ export function ListColumn({ list, cards, onOpenCard }: Props) {
       <div
         ref={setDropRef}
         className={cn(
-          "flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto scrollbar-thin px-2",
-          isOver && "bg-primary/5 rounded-lg",
+          "flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto px-2 py-1",
+          isOver && "bg-slate-200/50 rounded-lg",
         )}
       >
         <SortableContext
@@ -119,16 +119,16 @@ export function ListColumn({ list, cards, onOpenCard }: Props) {
         </SortableContext>
       </div>
 
-      <div className="p-2">
+      <div className="px-2 pb-2 pt-0">
         {adding ? (
-          <div className="rounded-xl border border-border bg-card p-2">
+          <div className="rounded-lg border border-slate-300 bg-white p-2 shadow-sm">
             <Textarea
               autoFocus
               rows={2}
               value={newCard}
               onChange={(e) => setNewCard(e.target.value)}
               placeholder="Karta sarlavhasi"
-              className="mb-2 resize-none"
+              className="mb-2 resize-none border-0 p-0 text-sm focus-visible:ring-0"
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
@@ -145,12 +145,14 @@ export function ListColumn({ list, cards, onOpenCard }: Props) {
                 size="sm"
                 onClick={handleAdd}
                 disabled={!newCard.trim()}
+                className="h-7 text-xs"
               >
-                Qo'shish
+                Karta qo'shish
               </Button>
               <Button
                 size="sm"
                 variant="ghost"
+                className="h-7 text-xs"
                 onClick={() => {
                   setAdding(false);
                   setNewCard("");
@@ -163,7 +165,7 @@ export function ListColumn({ list, cards, onOpenCard }: Props) {
         ) : (
           <button
             onClick={() => setAdding(true)}
-            className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-muted-foreground transition hover:bg-muted hover:text-foreground"
+            className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-slate-600 transition hover:bg-slate-200/70"
           >
             <Plus className="size-4" />
             Karta qo'shish

@@ -2,7 +2,7 @@
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { CalendarClock, CheckCircle2, MessageSquare } from "lucide-react";
+import { CalendarClock, CheckCircle2, MessageSquare, AlignLeft } from "lucide-react";
 import { format, isPast, isToday } from "date-fns";
 import type { Card } from "@/lib/types";
 import { LABEL_COLORS } from "@/lib/backgrounds";
@@ -43,6 +43,8 @@ export function KanbanCard({
     transition,
   };
 
+  const hasDescription = !!card.description;
+
   return (
     <div
       ref={setNodeRef}
@@ -50,8 +52,8 @@ export function KanbanCard({
       {...attributes}
       {...listeners}
       className={cn(
-        "group relative cursor-grab touch-none rounded-xl border border-border bg-card p-3 shadow-sm transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md active:cursor-grabbing",
-        isDragging && "opacity-50",
+        "group relative cursor-grab touch-none rounded-lg border border-border bg-white p-2 shadow-sm transition hover:border-primary/30 hover:shadow active:cursor-grabbing",
+        isDragging && "opacity-50 rotate-2",
         card.completed && "opacity-75",
       )}
       onDoubleClick={() => onOpen(card.id)}
@@ -61,13 +63,13 @@ export function KanbanCard({
       }}
     >
       {card.labels.length > 0 && (
-        <div className="mb-2 flex flex-wrap gap-1">
+        <div className="mb-1.5 flex flex-wrap gap-1">
           {card.labels.map((l) => {
             const color = LABEL_COLORS[l.color];
             return (
               <span
                 key={l.id}
-                className="inline-flex h-5 items-center rounded-full px-2 text-[10px] font-semibold"
+                className="inline-flex h-4 items-center rounded px-1.5 text-[10px] font-medium"
                 style={{ background: color.bg, color: color.fg }}
               >
                 {l.name}
@@ -78,46 +80,53 @@ export function KanbanCard({
       )}
       <div
         className={cn(
-          "text-sm font-medium leading-snug",
+          "text-sm leading-tight",
           card.completed && "line-through text-muted-foreground",
         )}
       >
         {card.title}
       </div>
-      <div className="mt-3 flex items-center gap-3 text-xs text-muted-foreground">
+      <div className="mt-2 flex items-center gap-2 flex-wrap">
         {card.dueDate && (
           <span
             className={cn(
-              "inline-flex items-center gap-1 rounded-md px-1.5 py-0.5",
+              "inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[11px] font-medium",
               overdue
-                ? "bg-destructive/15 text-destructive"
+                ? "bg-red-100 text-red-700"
                 : soon
-                  ? "bg-amber-500/15 text-amber-600 dark:text-amber-400"
-                  : "",
+                  ? "bg-amber-100 text-amber-700"
+                  : card.completed
+                    ? "bg-green-100 text-green-700"
+                    : "bg-slate-100 text-slate-700",
             )}
           >
             {card.completed ? (
-              <CheckCircle2 className="size-3.5" />
+              <CheckCircle2 className="size-3" />
             ) : (
-              <CalendarClock className="size-3.5" />
+              <CalendarClock className="size-3" />
             )}
             {format(card.dueDate, "d MMM")}
           </span>
         )}
+        {hasDescription && (
+          <span className="text-slate-400">
+            <AlignLeft className="size-3.5" />
+          </span>
+        )}
         {commentCount > 0 && (
-          <span className="inline-flex items-center gap-1">
-            <MessageSquare className="size-3.5" />
+          <span className="inline-flex items-center gap-0.5 text-[11px] text-slate-500">
+            <MessageSquare className="size-3" />
             {commentCount}
           </span>
         )}
         {members.length > 0 && (
-          <div className="ml-auto flex -space-x-1.5">
-            {members.slice(0, 3).map((m) => (
+          <div className="ml-auto flex -space-x-1">
+            {members.slice(0, 2).map((m) => (
               <UserAvatar key={m.id} user={m} size="xs" ring />
             ))}
-            {members.length > 3 && (
-              <span className="grid size-6 place-items-center rounded-full border-2 border-background bg-muted text-[9px] font-medium">
-                +{members.length - 3}
+            {members.length > 2 && (
+              <span className="grid size-5 place-items-center rounded-full border border-white bg-slate-200 text-[9px] font-medium text-slate-600">
+                +{members.length - 2}
               </span>
             )}
           </div>
