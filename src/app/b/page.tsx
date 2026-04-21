@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   ChevronLeft,
+  ImageIcon,
   LayoutDashboard,
   MoreHorizontal,
   Star,
@@ -19,6 +20,7 @@ import { MemberPicker } from "@/components/member-picker";
 import { InviteDialog } from "@/components/invite-dialog";
 import { InvitationsInbox } from "@/components/invitations-inbox";
 import { BoardView } from "@/components/kanban/board-view";
+import { BackgroundPickerDialog } from "@/components/background-picker-dialog";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -28,7 +30,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useDataStore } from "@/store/data-store";
 import { useAuthStore } from "@/store/auth-store";
-import { BOARD_BACKGROUNDS } from "@/lib/backgrounds";
+import { BOARD_BACKGROUNDS, BOARD_BACKGROUND_IMAGES } from "@/lib/backgrounds";
 import { cn } from "@/lib/utils";
 
 export default function BoardPage() {
@@ -66,6 +68,7 @@ function BoardPageContent({ boardId }: { boardId: string }) {
   const currentUser = users.find((u) => u.id === currentUserId);
   const toggleStar = useDataStore((s) => s.toggleStar);
   const deleteBoard = useDataStore((s) => s.deleteBoard);
+  const updateBoard = useDataStore((s) => s.updateBoard);
   const addBoardMember = useDataStore((s) => s.addBoardMember);
   const removeBoardMember = useDataStore((s) => s.removeBoardMember);
 
@@ -103,10 +106,15 @@ function BoardPageContent({ boardId }: { boardId: string }) {
 
   const boardMembers = users.filter((u) => board.memberIds.includes(u.id));
 
+  const isImageBackground = board.background.startsWith("image-");
+  const backgroundStyle = isImageBackground
+    ? { backgroundImage: `url(${BOARD_BACKGROUNDS[board.background]})`, backgroundSize: "cover", backgroundPosition: "center" }
+    : { background: BOARD_BACKGROUNDS[board.background] };
+
   return (
     <div
       className="relative flex h-screen flex-col"
-      style={{ background: BOARD_BACKGROUNDS[board.background] }}
+      style={backgroundStyle}
     >
       <div className="pointer-events-none absolute inset-0 bg-black/20" />
       <header className="relative z-20 border-b border-white/10 bg-black/10 backdrop-blur">
@@ -202,7 +210,20 @@ function BoardPageContent({ boardId }: { boardId: string }) {
                   </Button>
                 }
               />
-              <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuContent align="end" className="w-52">
+                <BackgroundPickerDialog
+                  currentBackground={board.background}
+                  onSelect={(bg) => updateBoard(board.id, { background: bg })}
+                  trigger={
+                    <DropdownMenuItem
+                      className="cursor-pointer"
+                      onSelect={(e) => e.preventDefault()}
+                    >
+                      <ImageIcon className="size-4" />
+                      Fonni o&apos;zgartirish
+                    </DropdownMenuItem>
+                  }
+                />
                 <DropdownMenuItem
                   onClick={() => {
                     if (

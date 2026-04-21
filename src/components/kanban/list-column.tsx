@@ -61,7 +61,7 @@ export function ListColumn({ list, cards, onOpenCard }: Props) {
         "flex max-h-[calc(100vh-180px)] w-72 shrink-0 flex-col rounded-xl bg-slate-100/90 shadow-sm transition",
         list.color && "ring-2 ring-offset-2",
       )}
-      style={list.color ? { ringColor: list.color } : undefined}
+      style={list.color ? { "--tw-ring-color": list.color } as React.CSSProperties : undefined}
     >
       <div className="flex items-center gap-2 px-3 py-2">
         <div className="flex-1 truncate text-sm font-semibold text-slate-800">
