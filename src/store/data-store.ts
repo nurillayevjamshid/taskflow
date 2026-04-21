@@ -471,17 +471,8 @@ export const useDataStore = create<DataState>()((set, get) => ({
   // ── lists ───────────────────────────────────────────────────────────────────
 
   createList: async (boardId, name) => {
-    const existing = get().lists.filter((l) => l.boardId === boardId);
-    const l: List = {
-      id: "l_" + makeId(),
-      boardId,
-      name: name.trim() || "Yangi ustun",
-      position: existing.length,
-      kind: "planned",
-      createdAt: Date.now(),
-    };
-    await setDoc(doc(db, "boards", boardId, "lists", l.id), l);
-    return l;
+    // Prevent creating new lists - we have exactly 5 fixed columns
+    throw new Error("Yangi ustun qo'shib bo'lmaydi - 5 ta doimiy ustun mavjud");
   },
   updateList: async (id, patch) => {
     const l = findList(id, get().lists);
@@ -491,6 +482,11 @@ export const useDataStore = create<DataState>()((set, get) => ({
   deleteList: async (id) => {
     const l = findList(id, get().lists);
     if (!l) return;
+    // Prevent deletion of default columns
+    const protectedKinds = ["planned", "in_progress", "review", "done", "failed"];
+    if (protectedKinds.includes(l.kind ?? "")) {
+      throw new Error("Bu ustunni o'chirib bo'lmaydi");
+    }
     const listCards = get().cards.filter((c) => c.listId === id);
     const cardIds = new Set(listCards.map((c) => c.id));
     const commentsToDelete = get().comments.filter((cm) =>
@@ -508,6 +504,24 @@ export const useDataStore = create<DataState>()((set, get) => ({
     await batch.commit();
   },
   reorderLists: async (boardId, orderedIds) => {
+    // Prevent reordering - columns must stay in fixed order
+    const boardLists = get().lists.filter((l) => l.boardId === boardId);
+    const protectedLists = boardLists.filter((l) =>
+      ["planned", "in_progress", "review", "done", "failed"].includes(l.kind ?? "")
+    );
+    // Only allow reordering if all protected lists are in their correct positions
+    for (const list of protectedLists) {
+      const expectedPosition =
+        list.kind === "planned" ? 0 :
+        list.kind === "in_progress" ? 1 :
+        list.kind === "review" ? 2 :
+        list.kind === "done" ? 3 :
+        list.kind === "failed" ? 4 : -1;
+      const currentIndex = orderedIds.indexOf(list.id);
+      if (currentIndex !== -1 && currentIndex !== expectedPosition) {
+        throw new Error("Ustunlar tartibini o'zgartirib bo'lmaydi");
+      }
+    }
     const batch = writeBatch(db);
     orderedIds.forEach((id, idx) => {
       batch.update(doc(db, "boards", boardId, "lists", id), { position: idx });

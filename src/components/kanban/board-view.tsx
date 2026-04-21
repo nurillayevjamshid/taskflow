@@ -13,18 +13,10 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import {
-  SortableContext,
-  arrayMove,
-  horizontalListSortingStrategy,
-  sortableKeyboardCoordinates,
-} from "@dnd-kit/sortable";
-import { Plus } from "lucide-react";
+import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { ListColumn } from "./list-column";
 import { KanbanCard } from "./kanban-card";
 import { CardDialog } from "./card-dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import type { Card } from "@/lib/types";
 import { useDataStore } from "@/store/data-store";
 
@@ -35,16 +27,12 @@ interface Props {
 export function BoardView({ boardId }: Props) {
   const allLists = useDataStore((s) => s.lists);
   const allCards = useDataStore((s) => s.cards);
-  const reorderLists = useDataStore((s) => s.reorderLists);
   const moveCard = useDataStore((s) => s.moveCard);
-  const createList = useDataStore((s) => s.createList);
   const migrateBoard = useDataStore((s) => s.migrateBoard);
   const reconcileCards = useDataStore((s) => s.reconcileCards);
 
   const [activeId, setActiveId] = useState<string | null>(null);
   const [openCardId, setOpenCardId] = useState<string | null>(null);
-  const [addingList, setAddingList] = useState(false);
-  const [newListName, setNewListName] = useState("");
 
   const lists = useMemo(
     () =>
@@ -92,7 +80,6 @@ export function BoardView({ boardId }: Props) {
   );
 
   const activeCard = activeId ? allCards.find((c) => c.id === activeId) : null;
-  const activeList = activeId ? lists.find((l) => l.id === activeId) : null;
 
   const findContainerForItem = (id: string): string | null => {
     if (lists.some((l) => l.id === id)) return null;
@@ -142,20 +129,12 @@ export function BoardView({ boardId }: Props) {
     const overIdStr = String(over.id);
     if (activeIdStr === overIdStr) return;
 
-    // list reordering
+    // list reordering - DISABLED (columns are fixed)
     if (
       active.data.current?.type === "list" &&
       over.data.current?.type === "list"
     ) {
-      const oldIndex = lists.findIndex((l) => l.id === activeIdStr);
-      const newIndex = lists.findIndex((l) => l.id === overIdStr);
-      if (oldIndex >= 0 && newIndex >= 0) {
-        const newOrder = arrayMove(lists, oldIndex, newIndex);
-        reorderLists(
-          boardId,
-          newOrder.map((l) => l.id),
-        );
-      }
+      // Columns are fixed, do not allow reordering
       return;
     }
 
@@ -182,13 +161,6 @@ export function BoardView({ boardId }: Props) {
     }
   };
 
-  const handleAddList = () => {
-    if (!newListName.trim()) return;
-    createList(boardId, newListName);
-    setNewListName("");
-    setAddingList(false);
-  };
-
   return (
     <>
       <DndContext
@@ -199,77 +171,20 @@ export function BoardView({ boardId }: Props) {
         onDragEnd={onDragEnd}
       >
         <div className="flex h-full gap-4 overflow-x-auto scrollbar-thin px-4 pb-6 sm:px-6">
-          <SortableContext
-            items={lists.map((l) => l.id)}
-            strategy={horizontalListSortingStrategy}
-          >
-            {lists.map((list) => (
-              <ListColumn
-                key={list.id}
-                list={list}
-                cards={cardsByList.get(list.id) ?? []}
-                onOpenCard={setOpenCardId}
-              />
-            ))}
-          </SortableContext>
-
-          <div className="shrink-0">
-            {addingList ? (
-              <div className="w-80 rounded-2xl border border-white/10 bg-background/80 p-2 backdrop-blur-md">
-                <Input
-                  autoFocus
-                  value={newListName}
-                  onChange={(e) => setNewListName(e.target.value)}
-                  placeholder="Ustun nomi"
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") handleAddList();
-                    if (e.key === "Escape") {
-                      setAddingList(false);
-                      setNewListName("");
-                    }
-                  }}
-                  className="mb-2"
-                />
-                <div className="flex gap-2">
-                  <Button size="sm" onClick={handleAddList} disabled={!newListName.trim()}>
-                    Qo&apos;shish
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => {
-                      setAddingList(false);
-                      setNewListName("");
-                    }}
-                  >
-                    Bekor
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <button
-                onClick={() => setAddingList(true)}
-                className="flex h-11 w-80 items-center justify-center gap-2 rounded-2xl border border-dashed border-white/25 bg-white/5 px-4 text-sm font-medium text-white/80 backdrop-blur-md transition hover:bg-white/15"
-              >
-                <Plus className="size-4" />
-                Ustun qo&apos;shish
-              </button>
-            )}
-          </div>
+          {lists.map((list) => (
+            <ListColumn
+              key={list.id}
+              list={list}
+              cards={cardsByList.get(list.id) ?? []}
+              onOpenCard={setOpenCardId}
+            />
+          ))}
         </div>
 
         <DragOverlay>
           {activeCard ? (
             <div className="w-72 rotate-2">
               <KanbanCard card={activeCard} onOpen={() => {}} />
-            </div>
-          ) : activeList ? (
-            <div className="w-80 rotate-1 opacity-95">
-              <ListColumn
-                list={activeList}
-                cards={cardsByList.get(activeList.id) ?? []}
-                onOpenCard={() => {}}
-              />
             </div>
           ) : null}
         </DragOverlay>
