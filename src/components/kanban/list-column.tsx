@@ -58,7 +58,7 @@ export function ListColumn({ list, cards, onOpenCard }: Props) {
   return (
     <div
       className={cn(
-        "flex h-full max-h-full w-72 shrink-0 flex-col rounded-xl bg-slate-100/90 shadow-sm transition",
+        "flex max-h-[calc(100vh-180px)] w-72 shrink-0 flex-col rounded-xl bg-slate-100/90 shadow-sm transition",
         list.color && "ring-2 ring-offset-2",
       )}
       style={list.color ? { ringColor: list.color } : undefined}
@@ -105,7 +105,7 @@ export function ListColumn({ list, cards, onOpenCard }: Props) {
       <div
         ref={setDropRef}
         className={cn(
-          "flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto px-2 py-1",
+          "flex min-h-[60px] flex-col gap-1.5 overflow-y-auto px-2 py-1",
           isOver && "bg-slate-200/50 rounded-lg",
         )}
       >
