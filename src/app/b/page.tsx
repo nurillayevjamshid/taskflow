@@ -104,7 +104,18 @@ function BoardPageContent({ boardId }: { boardId: string }) {
     );
   }
 
-  const boardMembers = users.filter((u) => board.memberIds.includes(u.id));
+  // Filter out demo/test users
+  const realUsers = users.filter((u) => {
+    const email = u.email.toLowerCase();
+    const name = u.name.toLowerCase();
+    // Exclude demo/test accounts
+    if (email.includes("firebase-") && email.includes("@taskly.uz")) return false;
+    if (name.includes("invitee")) return false;
+    if (name.includes("qa") && email.includes("taskly")) return false;
+    return true;
+  });
+
+  const boardMembers = realUsers.filter((u) => board.memberIds.includes(u.id));
 
   const isImageBackground = board.background.startsWith("image-");
   const backgroundStyle = isImageBackground
@@ -164,7 +175,7 @@ function BoardPageContent({ boardId }: { boardId: string }) {
               )}
             </div>
             <MemberPicker
-              allUsers={users.filter((u) => u.id !== currentUserId || true)}
+              allUsers={realUsers.filter((u) => u.id !== currentUserId)}
               selectedIds={board.memberIds}
               onToggle={(uid) => {
                 if (board.memberIds.includes(uid))
