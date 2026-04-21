@@ -1,0 +1,6 @@
+[build]
+  command = "npm run build"
+  publish = "out"
+
+# Next.js is configured with `output: 'export'` so `next build` emits a
+# fully static site at ./out. No Next.js runtime/plugin is needed.
